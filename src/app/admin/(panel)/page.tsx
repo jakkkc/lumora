@@ -99,10 +99,6 @@ export default async function Dashboard() {
           </div>
         )}
       </section>
-
-      <p className="text-xs text-muted">
-        Managing requests, stays, rides and photos from here is the next step.
-      </p>
     </div>
   );
 }
