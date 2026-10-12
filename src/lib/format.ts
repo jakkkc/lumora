@@ -21,3 +21,16 @@ export const driverLabel: Record<string, string> = {
   with_driver: "Driver included",
   both: "Self-drive or with a driver",
 };
+
+export function longDate(iso: string) {
+  return new Date(iso + "T00:00:00").toLocaleDateString("en-GB", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+export function daysBetween(a: string, b: string) {
+  return Math.round((Date.parse(b + "T00:00:00") - Date.parse(a + "T00:00:00")) / 86400000);
+}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import AdminNav from "@/components/admin/AdminNav";
 import { AnimatedWordmark } from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
 import { supabaseServer } from "@/lib/supabase/server";
@@ -52,6 +53,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </form>
           </div>
         </div>
+        <AdminNav />
       </header>
       <div className="mx-auto max-w-6xl px-5 py-10 sm:px-8">{children}</div>
     </div>

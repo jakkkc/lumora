@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { supabaseServer } from "@/lib/supabase/server";
 
 type Row = {
@@ -86,7 +87,7 @@ export default async function Dashboard() {
               <tbody className="divide-y divide-line">
                 {rows.map((r) => (
                   <tr key={r.id}>
-                    <td className="py-3 pr-4 tracking-wider">{r.reference}</td>
+                    <td className="py-3 pr-4 tracking-wider"><Link href={`/admin/requests/${r.id}`} className="underline decoration-line underline-offset-4 hover:decoration-accent">{r.reference}</Link></td>
                     <td className="py-3 pr-4">{r.full_name}</td>
                     <td className="py-3 pr-4">{r.property?.title ?? r.vehicle?.title ?? "Removed listing"}</td>
                     <td className="py-3 pr-4 whitespace-nowrap">{when(r.starts_on)} to {when(r.ends_on)}</td>
