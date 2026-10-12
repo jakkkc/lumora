@@ -24,14 +24,22 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#1B2A41",
   width: "device-width",
   initialScale: 1,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#FBF8F3" },
+    { media: "(prefers-color-scheme: dark)", color: "#1B2A41" },
+  ],
 };
+
+const themeScript = `(function(){try{var t=localStorage.getItem('lumora-theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}document.documentElement.dataset.theme=t}catch(e){document.documentElement.dataset.theme='light'}})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${jost.variable} ${cormorant.variable}`}>
+    <html lang="en" className={`${jost.variable} ${cormorant.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="flex min-h-screen flex-col">
         <Header />
         <main className="flex-1">{children}</main>
