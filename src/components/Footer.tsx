@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AnimatedWordmark } from "./Logo";
+import InstallApp from "./InstallApp";
 import { CREDIT_NAME, CREDIT_URL, PHONE_DISPLAY, PHONE_TEL, WHATSAPP_URL } from "@/lib/contact";
 
 export default function Footer() {
@@ -11,6 +12,7 @@ export default function Footer() {
           <p className="max-w-xs text-sm text-cream/70">
             Apartments and cars on the Kenyan coast, looked after by one team.
           </p>
+          <InstallApp />
         </div>
 
         <nav aria-label="Footer" className="space-y-3 text-sm tracking-widest text-cream/80">

@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SiteChrome from "@/components/SiteChrome";
+import ServiceWorker from "@/components/ServiceWorker";
 
 const jost = Jost({
   subsets: ["latin"],
@@ -22,6 +23,9 @@ export const metadata: Metadata = {
   title: { default: "Lumora | Stays and rides on the Kenyan coast", template: "%s | Lumora" },
   description:
     "Luxury apartments and cars for hire in Mombasa and along the Kenyan coast. Send a request and our team will confirm it with you.",
+  applicationName: "Lumora",
+  appleWebApp: { capable: true, title: "Lumora", statusBarStyle: "default" },
+  formatDetection: { telephone: false },
 };
 
 export const viewport: Viewport = {
@@ -45,6 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SiteChrome header={<Header />} footer={<Footer />}>
           {children}
         </SiteChrome>
+        <ServiceWorker />
       </body>
     </html>
   );
