@@ -24,6 +24,7 @@ export const metadata: Metadata = {
   description:
     "Luxury apartments and cars for hire in Mombasa and along the Kenyan coast. Send a request and our team will confirm it with you.",
   applicationName: "Lumora",
+  manifest: "/manifest.webmanifest",
   appleWebApp: { capable: true, title: "Lumora", statusBarStyle: "default" },
   formatDetection: { telephone: false },
 };

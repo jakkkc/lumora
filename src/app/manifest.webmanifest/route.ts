@@ -1,7 +1,7 @@
-import type { MetadataRoute } from "next";
+export const dynamic = "force-static";
 
-export default function manifest(): MetadataRoute.Manifest {
-  return {
+export function GET() {
+  const manifest = {
     id: "/",
     name: "Lumora",
     short_name: "Lumora",
@@ -24,4 +24,7 @@ export default function manifest(): MetadataRoute.Manifest {
       { name: "Browse rides", url: "/rides" },
     ],
   };
+  return new Response(JSON.stringify(manifest), {
+    headers: { "Content-Type": "application/manifest+json; charset=utf-8" },
+  });
 }
