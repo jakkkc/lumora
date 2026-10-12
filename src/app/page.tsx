@@ -14,17 +14,28 @@ export default async function Home() {
   return (
     <>
       <section className="relative overflow-hidden bg-bg text-fg">
-        <div className="glow pointer-events-none absolute -right-40 top-1/2 h-[46rem] w-[46rem] -translate-y-1/2 rounded-full sm:-right-24 sm:h-[60rem] sm:w-[60rem]" aria-hidden="true" />
-        <AnimatedMark className="pointer-events-none absolute -right-24 top-1/2 h-[34rem] w-[34rem] -translate-y-1/2 text-accent sm:-right-10 sm:h-[44rem] sm:w-[44rem]" />
-        <div className="relative mx-auto max-w-6xl px-5 py-28 sm:px-8 sm:py-40">
-          <h1 className="max-w-xl text-4xl sm:text-6xl">
+        {/* Wide screens: the big ring sits on the right */}
+        <div
+          className="glow pointer-events-none absolute -right-24 top-1/2 hidden h-[52rem] w-[52rem] -translate-y-1/2 rounded-full lg:block"
+          aria-hidden="true"
+        />
+        <AnimatedMark className="pointer-events-none absolute -right-20 top-1/2 hidden h-[36rem] w-[36rem] -translate-y-1/2 text-accent lg:block xl:-right-10 xl:h-[44rem] xl:w-[44rem]" />
+
+        <div className="relative mx-auto max-w-6xl px-5 py-14 text-center sm:px-8 sm:py-20 lg:py-40 lg:text-left">
+          {/* Phones and tablets: the ring sits above the words so nothing overlaps */}
+          <div className="relative mx-auto mb-10 grid h-52 w-52 place-items-center sm:h-60 sm:w-60 lg:hidden">
+            <div className="glow absolute -inset-10 rounded-full" aria-hidden="true" />
+            <AnimatedMark className="relative h-40 w-40 text-accent sm:h-48 sm:w-48" />
+          </div>
+
+          <h1 className="mx-auto max-w-xl text-4xl sm:text-6xl lg:mx-0">
             stays and rides on the kenyan coast
           </h1>
-          <p className="mt-6 max-w-md font-serif text-xl italic text-muted">
+          <p className="mx-auto mt-6 max-w-md font-serif text-xl italic text-muted lg:mx-0">
             Beautiful apartments and well-kept cars, arranged by one team that
             answers you personally.
           </p>
-          <div className="mt-10 flex flex-wrap gap-4 text-sm tracking-widest">
+          <div className="mt-10 flex flex-wrap justify-center gap-4 text-sm tracking-widest lg:justify-start">
             <Link href="/stays" className="bg-accent px-7 py-3.5 text-on-accent transition-colors hover:opacity-90">
               Browse stays
             </Link>
