@@ -4,6 +4,7 @@ import { startTransition, useActionState, useEffect, useState } from "react";
 import { submitRequest, type RequestState } from "@/app/actions/request";
 import { money, plural } from "@/lib/format";
 import { whatsappLink } from "@/lib/contact";
+import ThemedSelect from "@/components/ThemedSelect";
 
 type Block = { starts_on: string; ends_on: string };
 
@@ -163,11 +164,7 @@ export default function RequestForm(p: Props) {
 
       <div className="mt-4">
         <label htmlFor="guests" className={label}>{isStay ? "Guests" : "Passengers"}</label>
-        <select id="guests" name="guests" className={field} defaultValue="1">
-          {Array.from({ length: p.maxGuests }, (_, i) => i + 1).map((n) => (
-            <option key={n} value={n}>{n}</option>
-          ))}
-        </select>
+        <ThemedSelect id="guests" name="guests" className={field} defaultValue="1" options={Array.from({ length: p.maxGuests }, (_, i) => [String(i + 1), String(i + 1)] as [string, string])} />
       </div>
 
       {!isStay && (

@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { saveListing, type SaveState } from "@/app/admin/(panel)/listing-actions";
+import ThemedSelect from "@/components/ThemedSelect";
 
 const box =
   "w-full border border-line bg-transparent px-3 py-2.5 text-sm focus:border-accent focus:outline-none";
@@ -42,11 +43,7 @@ function Pick(p: FieldProps & { options: [string, string][] }) {
   return (
     <div className={p.wide ? "sm:col-span-2" : ""}>
       <label htmlFor={p.name} className={lab}>{p.label}</label>
-      <select id={p.name} name={p.name} defaultValue={p.defaultValue} className={box}>
-        {p.options.map(([v, l]) => (
-          <option key={v} value={v}>{l}</option>
-        ))}
-      </select>
+      <ThemedSelect id={p.name} name={p.name} defaultValue={p.defaultValue} className={box} options={p.options} />
       {p.hint && <p className="mt-1 text-xs text-muted">{p.hint}</p>}
     </div>
   );
