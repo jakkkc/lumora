@@ -1,10 +1,20 @@
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import { AnimatedMark } from "@/components/Logo";
 import ListingCard from "@/components/ListingCard";
 import { getRides, getStays } from "@/lib/data";
 import { driverLabel, money, plural, sortImages } from "@/lib/format";
 
 export const revalidate = 60;
+
+/*
+  Where the ring's left edge sits. One rule for every screen width:
+  - 1280px and wider: exactly the original design
+  - tablets and small laptops: kept clear of the text (never left of 616px)
+  - phones: a slice of the ring shows (about 40px on the smallest, up to 60px), pushed further right as the screen gets smaller
+*/
+const RING_LEFT =
+  "min(max(616px, calc(100% - 664px)), calc(100% - clamp(87px, calc(25% - 3px), 107px)))";
 
 export default async function Home() {
   const [stays, rides] = await Promise.all([getStays(), getRides()]);
@@ -13,29 +23,29 @@ export default async function Home() {
 
   return (
     <>
-      <section className="relative overflow-hidden bg-bg text-fg">
-        {/* Wide screens: the big ring sits on the right */}
+      <section
+        className="relative overflow-hidden bg-bg text-fg"
+        style={{ "--ring-left": RING_LEFT } as CSSProperties}
+      >
         <div
-          className="glow pointer-events-none absolute -right-24 top-1/2 hidden h-[52rem] w-[52rem] -translate-y-1/2 rounded-full lg:block"
+          className="glow pointer-events-none absolute top-1/2 -ml-24 h-[46rem] w-[46rem] -translate-y-1/2 rounded-full sm:-ml-[200px] sm:h-[60rem] sm:w-[60rem]"
+          style={{ left: "var(--ring-left)" }}
           aria-hidden="true"
         />
-        <AnimatedMark className="pointer-events-none absolute -right-20 top-1/2 hidden h-[36rem] w-[36rem] -translate-y-1/2 text-accent lg:block xl:-right-10 xl:h-[44rem] xl:w-[44rem]" />
+        <AnimatedMark
+          className="pointer-events-none absolute top-1/2 h-[34rem] w-[34rem] -translate-y-1/2 text-accent [--mk-sw:34] sm:h-[44rem] sm:w-[44rem] sm:[--mk-sw:74]"
+          style={{ left: "var(--ring-left)" }}
+        />
 
-        <div className="relative mx-auto max-w-6xl px-5 py-14 text-center sm:px-8 sm:py-20 lg:py-40 lg:text-left">
-          {/* Phones and tablets: the ring sits above the words so nothing overlaps */}
-          <div className="relative mx-auto mb-10 grid h-52 w-52 place-items-center sm:h-60 sm:w-60 lg:hidden">
-            <div className="glow absolute -inset-10 rounded-full" aria-hidden="true" />
-            <AnimatedMark className="relative h-40 w-40 text-accent sm:h-48 sm:w-48" />
-          </div>
-
-          <h1 className="mx-auto max-w-xl text-4xl sm:text-6xl lg:mx-0">
+        <div className="relative mx-auto max-w-6xl px-5 py-28 sm:px-8 sm:py-40">
+          <h1 className="max-w-xl text-4xl sm:text-6xl">
             stays and rides on the kenyan coast
           </h1>
-          <p className="mx-auto mt-6 max-w-md font-serif text-xl italic text-muted lg:mx-0">
+          <p className="mt-6 max-w-md font-serif text-xl italic text-muted">
             Beautiful apartments and well-kept cars, arranged by one team that
             answers you personally.
           </p>
-          <div className="mt-10 flex flex-wrap justify-center gap-4 text-sm tracking-widest lg:justify-start">
+          <div className="mt-10 flex flex-wrap gap-4 text-sm tracking-widest">
             <Link href="/stays" className="bg-accent px-7 py-3.5 text-on-accent transition-colors hover:opacity-90">
               Browse stays
             </Link>

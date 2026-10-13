@@ -65,9 +65,9 @@ export function Mark({ className, title = "Lumora" }: Props) {
 }
 
 /** Ring traces on and off while the dot pulses */
-export function AnimatedMark({ className, title = "" }: Props) {
+export function AnimatedMark({ className, title = "", style }: Props & { style?: CSSProperties }) {
   return (
-    <svg viewBox="295 295 490 490" className={className} role={title ? "img" : "presentation"} aria-label={title || undefined} aria-hidden={title ? undefined : true}>
+    <svg viewBox="295 295 490 490" className={className} style={style} role={title ? "img" : "presentation"} aria-label={title || undefined} aria-hidden={title ? undefined : true}>
       <circle
         className="mk-ring"
         pathLength={1}

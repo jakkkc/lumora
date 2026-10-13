@@ -188,3 +188,6 @@ h1, h2, h3 {
 :root:not([data-theme="dark"]) .glow {
   background: radial-gradient(circle, rgb(27 42 65 / 0.10) 0%, transparent 62%);
 }
+
+/* ring thickness can be overridden per use (phones use a thinner line on the home hero) */
+.mk-ring { stroke-width: var(--mk-sw, 74); }
