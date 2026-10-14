@@ -31,7 +31,7 @@ export default function PhotoManager({
   listingId,
   initial,
 }: {
-  kind: "stay" | "ride";
+  kind: "stay" | "ride" | "tour";
   listingId: string;
   initial: Img[];
 }) {
@@ -39,8 +39,8 @@ export default function PhotoManager({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const input = useRef<HTMLInputElement>(null);
-  const col = kind === "stay" ? "property_id" : "vehicle_id";
-  const folder = kind === "stay" ? "properties" : "vehicles";
+  const col = kind === "stay" ? "property_id" : kind === "ride" ? "vehicle_id" : "tour_id";
+  const folder = kind === "stay" ? "properties" : kind === "ride" ? "vehicles" : "tours";
   const sorted = [...images].sort((a, b) => a.sort_order - b.sort_order);
 
   async function onFiles(files: FileList | null) {

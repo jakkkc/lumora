@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { Jost, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
@@ -43,10 +44,8 @@ const themeScript = `(function(){try{var t=localStorage.getItem('lumora-theme');
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${jost.variable} ${cormorant.variable}`} suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
       <body className="flex min-h-screen flex-col">
+        <Script id="lumora-theme" strategy="beforeInteractive">{themeScript}</Script>
         <SiteChrome header={<Header />} footer={<Footer />}>
           {children}
         </SiteChrome>

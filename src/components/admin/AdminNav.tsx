@@ -2,12 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Icon, { type IconName } from "@/components/Icon";
 
-const links = [
-  { href: "/admin", label: "Dashboard", exact: true },
-  { href: "/admin/requests", label: "Requests" },
-  { href: "/admin/stays", label: "Stays" },
-  { href: "/admin/rides", label: "Rides" },
+const links: { href: string; label: string; icon: IconName; exact?: boolean }[] = [
+  { href: "/admin", label: "Dashboard", icon: "dashboard", exact: true },
+  { href: "/admin/requests", label: "Requests", icon: "inbox" },
+  { href: "/admin/stays", label: "Stays", icon: "home" },
+  { href: "/admin/rides", label: "Rides", icon: "car" },
+  { href: "/admin/tours", label: "Tours", icon: "compass" },
+  { href: "/admin/locations", label: "Locations", icon: "pin" },
 ];
 
 export default function AdminNav() {
@@ -17,7 +20,13 @@ export default function AdminNav() {
       {links.map((l) => {
         const active = l.exact ? pathname === l.href : pathname.startsWith(l.href);
         return (
-          <Link key={l.href} href={l.href} className="nav-link whitespace-nowrap" aria-current={active ? "page" : undefined}>
+          <Link
+            key={l.href}
+            href={l.href}
+            className="nav-link inline-flex items-center gap-2 whitespace-nowrap"
+            aria-current={active ? "page" : undefined}
+          >
+            <Icon name={l.icon} size={16} />
             {l.label}
           </Link>
         );

@@ -2,7 +2,7 @@
 
 import { deleteListing } from "@/app/admin/(panel)/listing-actions";
 
-export default function DeleteListing({ kind, id, title }: { kind: "stay" | "ride"; id: string; title: string }) {
+export default function DeleteListing({ kind, id, title }: { kind: "stay" | "ride" | "tour"; id: string; title: string }) {
   return (
     <form
       action={deleteListing}
