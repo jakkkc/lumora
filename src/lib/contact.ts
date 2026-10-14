@@ -1,7 +1,7 @@
 // One number for everything: calls, WhatsApp and help.
-export const PHONE_DISPLAY = "+254 757 802 406";
-export const PHONE_TEL = "+254757802406";
-export const WHATSAPP_URL = "https://wa.me/254757802406";
+export const PHONE_DISPLAY = "+254 715 461 584";
+export const PHONE_TEL = "+254715461584";
+export const WHATSAPP_URL = "https://wa.me/254715461584";
 
 export function whatsappLink(message?: string) {
   return message ? `${WHATSAPP_URL}?text=${encodeURIComponent(message)}` : WHATSAPP_URL;
