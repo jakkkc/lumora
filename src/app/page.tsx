@@ -2,7 +2,9 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 import { AnimatedMark } from "@/components/Logo";
 import ListingCard from "@/components/ListingCard";
-import { getRides, getStays } from "@/lib/data";
+import SearchBox from "@/components/search/SearchBox";
+import { TOURS_READY } from "@/lib/config";
+import { getLocations, getRides, getStays } from "@/lib/data";
 import { driverLabel, money, plural, sortImages } from "@/lib/format";
 
 export const revalidate = 60;
@@ -11,13 +13,13 @@ export const revalidate = 60;
   Where the ring's left edge sits. One rule for every screen width:
   - 1280px and wider: exactly the original design
   - tablets and small laptops: kept clear of the text (never left of 616px)
-  - phones: a slice of the ring shows (about 40px on the smallest, up to 60px), pushed further right as the screen gets smaller
+  - phones: a slice of the ring shows, pushed further right as the screen gets smaller
 */
 const RING_LEFT =
   "min(max(616px, calc(100% - 664px)), calc(100% - clamp(87px, calc(25% - 3px), 107px)))";
 
 export default async function Home() {
-  const [stays, rides] = await Promise.all([getStays(), getRides()]);
+  const [stays, rides, locations] = await Promise.all([getStays(), getRides(), getLocations()]);
   const featuredStays = (stays.some((s) => s.featured) ? stays.filter((s) => s.featured) : stays).slice(0, 3);
   const featuredRides = (rides.some((r) => r.featured) ? rides.filter((r) => r.featured) : rides).slice(0, 3);
 
@@ -37,7 +39,7 @@ export default async function Home() {
           style={{ left: "var(--ring-left)" }}
         />
 
-        <div className="relative mx-auto max-w-6xl px-5 py-28 sm:px-8 sm:py-40">
+        <div className="relative mx-auto max-w-6xl px-5 py-24 sm:px-8 sm:py-36">
           <h1 className="max-w-xl text-4xl sm:text-6xl">
             stays and rides on the kenyan coast
           </h1>
@@ -45,13 +47,12 @@ export default async function Home() {
             Beautiful apartments and well-kept cars, arranged by one team that
             answers you personally.
           </p>
-          <div className="mt-10 flex flex-wrap gap-4 text-sm tracking-widest">
-            <Link href="/stays" className="bg-accent px-7 py-3.5 text-on-accent transition-colors hover:opacity-90">
-              Browse stays
-            </Link>
-            <Link href="/rides" className="border border-accent px-7 py-3.5 text-fg transition-colors hover:bg-accent/15">
-              Browse rides
-            </Link>
+          <div className="mt-10 max-w-3xl">
+            <SearchBox
+              locations={locations}
+              toursReady={TOURS_READY}
+              initial={{ type: "stay", location: locations[0]?.slug ?? "", from: "", to: "" }}
+            />
           </div>
         </div>
       </section>

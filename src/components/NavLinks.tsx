@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { TOURS_READY } from "@/lib/config";
 
 const links = [
   { href: "/stays", label: "Stays" },
   { href: "/rides", label: "Rides" },
+  ...(TOURS_READY ? [{ href: "/tours", label: "Tours" }] : []),
 ];
 
 export default function NavLinks() {

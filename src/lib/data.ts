@@ -61,3 +61,16 @@ export async function getBlocks(kind: "stay" | "ride", id: string): Promise<Bloc
   if (error) console.error("getBlocks:", error.message);
   return (data ?? []) as Block[];
 }
+
+export type PublicLocation = { id: string; slug: string; name: string };
+
+export async function getLocations(): Promise<PublicLocation[]> {
+  const { data, error } = await supabasePublic()
+    .from("locations")
+    .select("id, slug, name")
+    .eq("active", true)
+    .order("sort_order")
+    .order("name");
+  if (error) console.error("getLocations:", error.message);
+  return (data ?? []) as PublicLocation[];
+}
