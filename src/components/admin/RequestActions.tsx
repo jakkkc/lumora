@@ -3,8 +3,22 @@
 import { useActionState } from "react";
 import { updateRequest, type ActionState } from "@/app/admin/(panel)/requests/actions";
 
-type Props = { id: string; status: string; notes: string };
+type Props = {
+  id: string;
+  status: string;
+  notes: string;
+  currency: string;
+  showPickupFee: boolean;
+  showDropoffFee: boolean;
+  pickupLabel: string;
+  dropoffLabel: string;
+  pickupFee: number | null;
+  dropoffFee: number | null;
+  finalTotal: number | null;
+};
 
+const box = "w-full border border-line bg-transparent px-3 py-2.5 text-sm focus:border-accent focus:outline-none";
+const lab = "mb-1.5 block text-xs tracking-widest text-muted";
 const primary =
   "bg-accent px-5 py-3 text-sm tracking-widest text-on-accent transition-opacity hover:opacity-90 disabled:opacity-50";
 const secondary =
@@ -12,25 +26,42 @@ const secondary =
 const quiet =
   "border border-line px-5 py-3 text-sm tracking-widest text-muted transition-colors hover:border-accent hover:text-fg disabled:opacity-50";
 
-export default function RequestActions({ id, status, notes }: Props) {
+export default function RequestActions(p: Props) {
   const [state, action, pending] = useActionState<ActionState, FormData>(updateRequest, {});
+  const { status } = p;
 
   return (
-    <form action={action} className="space-y-4">
-      <input type="hidden" name="id" value={id} />
+    <form action={action} className="space-y-5">
+      <input type="hidden" name="id" value={p.id} />
+
+      {(p.showPickupFee || p.showDropoffFee) && (
+        <div className="space-y-4">
+          {p.showPickupFee && (
+            <div>
+              <label htmlFor="pickup_fee" className={lab}>{p.pickupLabel} fee ({p.currency})</label>
+              <input id="pickup_fee" name="pickup_fee" type="number" min={0} step="1" defaultValue={p.pickupFee ?? ""} className={box} placeholder="Not set yet" />
+            </div>
+          )}
+          {p.showDropoffFee && (
+            <div>
+              <label htmlFor="dropoff_fee" className={lab}>{p.dropoffLabel} fee ({p.currency})</label>
+              <input id="dropoff_fee" name="dropoff_fee" type="number" min={0} step="1" defaultValue={p.dropoffFee ?? ""} className={box} placeholder="Not set yet" />
+            </div>
+          )}
+          <p className="text-xs text-muted">For a map pin, enter the price you quoted the guest on WhatsApp.</p>
+        </div>
+      )}
 
       <div>
-        <label htmlFor="notes" className="mb-1.5 block text-xs tracking-widest text-muted">
-          Private notes (guests never see these)
-        </label>
+        <label htmlFor="final_total" className={lab}>Final price agreed ({p.currency})</label>
+        <input id="final_total" name="final_total" type="number" min={0} step="1" defaultValue={p.finalTotal ?? ""} className={box} placeholder="Not set yet" />
+      </div>
+
+      <div>
+        <label htmlFor="notes" className={lab}>Private notes (guests never see these)</label>
         <textarea
-          id="notes"
-          name="notes"
-          rows={4}
-          defaultValue={notes}
-          maxLength={4000}
-          className="w-full border border-line bg-transparent px-3 py-2.5 text-sm focus:border-accent focus:outline-none"
-          placeholder="Price agreed, payment received, arrival time..."
+          id="notes" name="notes" rows={4} defaultValue={p.notes} maxLength={4000} className={box}
+          placeholder="Payment received, arrival time, driver assigned..."
         />
       </div>
 
@@ -66,7 +97,7 @@ export default function RequestActions({ id, status, notes }: Props) {
           </button>
         )}
         <button name="status" value={status} disabled={pending} className={quiet}>
-          Save notes only
+          Save prices and notes only
         </button>
       </div>
 

@@ -1,6 +1,6 @@
 /* Lumora service worker: offline pages and faster repeat visits.
    Never stores the admin area or anything private. */
-const VERSION = "lumora-v1";
+const VERSION = "lumora-v2";
 const PAGES = `${VERSION}-pages`;
 const STATIC = `${VERSION}-static`;
 const IMAGES = `${VERSION}-images`;
@@ -29,6 +29,9 @@ async function trim(name, max) {
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
+
+  // Never take over localhost, so development always shows fresh code.
+  if (self.location.hostname === "localhost" || self.location.hostname === "127.0.0.1") return;
 
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;

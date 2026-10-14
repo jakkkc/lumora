@@ -11,6 +11,7 @@ const links: { href: string; label: string; icon: IconName; exact?: boolean }[] 
   { href: "/admin/rides", label: "Rides", icon: "car" },
   { href: "/admin/tours", label: "Tours", icon: "compass" },
   { href: "/admin/locations", label: "Locations", icon: "pin" },
+  { href: "/admin/policies", label: "Policies", icon: "policy" },
 ];
 
 export default function AdminNav() {
