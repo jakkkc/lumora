@@ -58,6 +58,7 @@ export default async function ResultsPage({
       <div className="mt-8">
         <SearchBox
           compact
+          mode="navigate"
           locations={locations}
           toursReady={TOURS_READY}
           initial={{ type, location: q.location, from: q.from, to: q.hasDates ? q.to : "" }}

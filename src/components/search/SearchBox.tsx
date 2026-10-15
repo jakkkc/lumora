@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useId, useState } from "react";
 import { useRouter } from "next/navigation";
 import Icon, { type IconName } from "@/components/Icon";
@@ -13,6 +14,9 @@ type Props = {
   toursReady: boolean;
   initial: { type: Type; location: string; from: string; to: string };
   compact?: boolean;
+  /** "choose": the tabs pick a service before searching (home page).
+      "navigate": the tabs are links, so the box always matches the page (results pages). */
+  mode?: "choose" | "navigate";
 };
 
 const SEGMENT: Record<Type, string> = { stay: "stays", ride: "rides", tour: "tours" };
@@ -36,10 +40,10 @@ function addDay(iso: string, n: number) {
   return d.toISOString().slice(0, 10);
 }
 
-export default function SearchBox({ locations, toursReady, initial, compact = false }: Props) {
+export default function SearchBox({ locations, toursReady, initial, compact = false, mode = "choose" }: Props) {
   const uid = useId();
   const router = useRouter();
-  const [type, setType] = useState<Type>(initial.type);
+  const [chosen, setChosen] = useState<Type>(initial.type);
   const [location, setLocation] = useState(initial.location);
   const [from, setFrom] = useState(initial.from);
   const [to, setTo] = useState(initial.to);
@@ -48,9 +52,23 @@ export default function SearchBox({ locations, toursReady, initial, compact = fa
 
   useEffect(() => setToday(new Date().toLocaleDateString("en-CA")), []);
 
+  // On results pages the box always follows the page, so it can never disagree with it.
+  const type: Type = mode === "navigate" ? initial.type : chosen;
   const tabs = TABS.filter((t) => t.key !== "tour" || toursReady);
   const [startLabel, endLabel] = LABELS[type];
   const toMin = from ? (type === "stay" ? addDay(from, 1) : from) : today;
+
+  function hrefFor(t: Type) {
+    const p = new URLSearchParams();
+    if (location) p.set("location", location);
+    if (from) {
+      p.set("from", from);
+      const keepTo = to && (t === "stay" ? to > from : to >= from);
+      if (keepTo) p.set("to", to);
+    }
+    const q = p.toString();
+    return `/${SEGMENT[t]}${q ? `?${q}` : ""}`;
+  }
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -60,13 +78,13 @@ export default function SearchBox({ locations, toursReady, initial, compact = fa
     if (from && to && (type === "stay" ? to <= from : to < from)) {
       return setError(type === "stay" ? "Check-out must be after check-in." : "The end date cannot be before the start date.");
     }
-    const p = new URLSearchParams();
-    if (location) p.set("location", location);
-    if (from) p.set("from", from);
-    if (to) p.set("to", to);
-    const q = p.toString();
-    router.push(`/${SEGMENT[type]}${q ? `?${q}` : ""}`);
+    router.push(hrefFor(type));
   }
+
+  const tabClass = (active: boolean) =>
+    `-mb-px inline-flex items-center gap-2 border-b pb-3 text-sm tracking-widest transition-colors ${
+      active ? "border-accent text-fg" : "border-transparent text-muted hover:text-fg"
+    }`;
 
   return (
     <form
@@ -74,23 +92,37 @@ export default function SearchBox({ locations, toursReady, initial, compact = fa
       aria-label="Search"
       className={compact ? "border border-line p-4 sm:p-5" : "border border-line bg-bg p-4 sm:p-5"}
     >
-      <div role="tablist" aria-label="What are you looking for" className="mb-5 flex flex-wrap gap-x-7 gap-y-2 border-b border-line">
-        {tabs.map((t) => (
-          <button
-            key={t.key}
-            type="button"
-            role="tab"
-            aria-selected={type === t.key}
-            onClick={() => setType(t.key)}
-            className={`-mb-px inline-flex items-center gap-2 border-b pb-3 text-sm tracking-widest transition-colors ${
-              type === t.key ? "border-accent text-fg" : "border-transparent text-muted hover:text-fg"
-            }`}
-          >
-            <Icon name={t.icon} size={17} />
-            {t.label}
-          </button>
-        ))}
-      </div>
+      {mode === "navigate" ? (
+        <nav aria-label="What are you looking for" className="mb-5 flex flex-wrap gap-x-7 gap-y-2 border-b border-line">
+          {tabs.map((t) => (
+            <Link
+              key={t.key}
+              href={hrefFor(t.key)}
+              aria-current={type === t.key ? "page" : undefined}
+              className={tabClass(type === t.key)}
+            >
+              <Icon name={t.icon} size={17} />
+              {t.label}
+            </Link>
+          ))}
+        </nav>
+      ) : (
+        <div role="tablist" aria-label="What are you looking for" className="mb-5 flex flex-wrap gap-x-7 gap-y-2 border-b border-line">
+          {tabs.map((t) => (
+            <button
+              key={t.key}
+              type="button"
+              role="tab"
+              aria-selected={type === t.key}
+              onClick={() => setChosen(t.key)}
+              className={tabClass(type === t.key)}
+            >
+              <Icon name={t.icon} size={17} />
+              {t.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_auto] lg:items-end">
         <div className="sm:col-span-2 lg:col-span-1">
