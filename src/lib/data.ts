@@ -157,3 +157,31 @@ export async function getFullDays(kind: "stay" | "ride" | "tour", id: string, ca
     .map(([d]) => d)
     .sort();
 }
+
+export type RideDetail = Omit<Vehicle, "price_per_day"> & {
+  price_per_day: number | null;
+  chauffeur_price_per_day: number | null;
+  location_id: string | null;
+  units: number;
+  or_similar: boolean;
+  min_days: number;
+  delivery_enabled: boolean;
+  location: { name: string; slug: string } | null;
+};
+
+export async function getRideDetail(slug: string): Promise<RideDetail | null> {
+  const { data, error } = await supabasePublic()
+    .from("vehicles")
+    .select(`*, location:locations(name, slug), ${IMAGES}`)
+    .eq("slug", slug)
+    .eq("status", "published")
+    .maybeSingle();
+  if (error) console.error("getRideDetail:", error.message);
+  if (!data) return null;
+  const num = (v: unknown) => (v === null || v === undefined ? null : Number(v));
+  return {
+    ...data,
+    price_per_day: num(data.price_per_day),
+    chauffeur_price_per_day: num(data.chauffeur_price_per_day),
+  } as RideDetail;
+}

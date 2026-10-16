@@ -3,39 +3,54 @@ import { notFound } from "next/navigation";
 import Gallery from "@/components/Gallery";
 import Facts from "@/components/Facts";
 import ItemList from "@/components/ItemList";
-import RequestForm from "@/components/RequestForm";
-import { getBlocks, getRide } from "@/lib/data";
-import { driverLabel, money, sortImages } from "@/lib/format";
+import PolicyList from "@/components/booking/PolicyList";
+import RideRequestForm from "@/components/booking/RideRequestForm";
+import { getFullDays, getPolicies, getRideDetail, getTransferPoints } from "@/lib/data";
+import { money, plural, sortImages } from "@/lib/format";
 
-export const revalidate = 60;
+type Props = {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ from?: string; to?: string; drive?: string }>;
+};
 
-type Props = { params: Promise<{ slug: string }> };
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: Pick<Props, "params">): Promise<Metadata> {
   const { slug } = await params;
-  const ride = await getRide(slug);
+  const ride = await getRideDetail(slug);
   if (!ride) return { title: "Ride not found" };
   return { title: ride.title, description: ride.tagline ?? undefined };
 }
 
-export default async function RidePage({ params }: Props) {
+export default async function RidePage({ params, searchParams }: Props) {
   const { slug } = await params;
-  const ride = await getRide(slug);
+  const sp = await searchParams;
+  const ride = await getRideDetail(slug);
   if (!ride) notFound();
 
-  const blocked = await getBlocks("ride", ride.id);
+  const [fullDays, points, allPolicies] = await Promise.all([
+    getFullDays("ride", ride.id, ride.units),
+    ride.delivery_enabled ? getTransferPoints(ride.location_id) : Promise.resolve([]),
+    getPolicies("ride"),
+  ]);
+  const policies = allPolicies.filter((x) => !x.only_for_similar || ride.or_similar);
+
+  const today = new Date().toLocaleDateString("en-CA", { timeZone: "Africa/Nairobi" });
+  const iso = /^\d{4}-\d{2}-\d{2}$/;
+  const from = sp.from && iso.test(sp.from) && sp.from >= today ? sp.from : "";
+  const to = from && sp.to && iso.test(sp.to) && sp.to >= from ? sp.to : "";
+
   const images = sortImages(ride.listing_images);
-  const facts: [string, string][] = [
-    ["Seats", String(ride.seats)],
-    ["Gearbox", ride.transmission === "automatic" ? "Automatic" : "Manual"],
-  ];
+  const both = ride.price_per_day !== null && ride.chauffeur_price_per_day !== null;
+  const name = [ride.make, ride.model].filter(Boolean).join(" ");
+
+  const facts: [string, string][] = [];
+  if (ride.location) facts.push(["Location", ride.location.name]);
+  facts.push(["Seats", String(ride.seats)]);
+  facts.push(["Gearbox", ride.transmission === "automatic" ? "Automatic" : "Manual"]);
   if (ride.fuel) facts.push(["Fuel", ride.fuel]);
   if (ride.year) facts.push(["Year", String(ride.year)]);
   if (ride.category) facts.push(["Type", ride.category]);
-  facts.push(["Driver", driverLabel[ride.driver_option]]);
-  if (ride.driver_option !== "self_drive" && ride.driver_fee_per_day > 0) {
-    facts.push(["Driver fee", `${money(ride.driver_fee_per_day, ride.currency)} per day`]);
-  }
+  facts.push(["Minimum rental", plural(ride.min_days, "day")]);
+  facts.push(["Drive", both ? "Self-drive or chauffeured" : ride.price_per_day !== null ? "Self-drive" : "Chauffeured"]);
   if (ride.deposit > 0) facts.push(["Deposit", money(ride.deposit, ride.currency)]);
 
   return (
@@ -43,6 +58,12 @@ export default async function RidePage({ params }: Props) {
       <header className="mb-8 max-w-2xl">
         {ride.category && <p className="text-sm tracking-widest text-muted">{ride.category}</p>}
         <h1 className="mt-2 text-3xl sm:text-5xl">{ride.title}</h1>
+        {name && (
+          <p className="mt-3 text-sm text-muted">
+            {name}
+            {ride.or_similar ? " or similar" : ""}
+          </p>
+        )}
         {ride.tagline && <p className="mt-4 font-serif text-xl italic text-muted">{ride.tagline}</p>}
       </header>
 
@@ -53,9 +74,7 @@ export default async function RidePage({ params }: Props) {
           {ride.description && (
             <section aria-labelledby="about">
               <h2 id="about" className="mb-4 text-xl">about this car</h2>
-              <p className="max-w-prose whitespace-pre-line font-serif text-lg leading-relaxed">
-                {ride.description}
-              </p>
+              <p className="max-w-prose whitespace-pre-line font-serif text-lg leading-relaxed">{ride.description}</p>
             </section>
           )}
 
@@ -65,19 +84,28 @@ export default async function RidePage({ params }: Props) {
               <ItemList items={ride.features} />
             </section>
           )}
+
+          <PolicyList policies={policies} />
         </div>
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
-          <RequestForm
-            kind="ride"
+          <RideRequestForm
             listingId={ride.id}
             title={ride.title}
-            price={ride.price_per_day}
             currency={ride.currency}
-            maxGuests={ride.seats}
-            driverOption={ride.driver_option}
-            driverFee={ride.driver_fee_per_day}
-            blocked={blocked}
+            seats={ride.seats}
+            minDays={ride.min_days}
+            selfPrice={ride.price_per_day}
+            chauffeurPrice={ride.chauffeur_price_per_day}
+            points={points
+              .filter((x) => x.ride_fee !== null)
+              .map((x) => ({ id: x.id, name: x.name, kind: x.kind, fee: x.ride_fee as number }))}
+            deliveryEnabled={ride.delivery_enabled}
+            fullDays={fullDays}
+            initialFrom={from}
+            initialTo={to}
+            initialDrive={sp.drive ?? ""}
+            hasPolicies={policies.length > 0}
           />
           <Facts items={facts} />
         </aside>
