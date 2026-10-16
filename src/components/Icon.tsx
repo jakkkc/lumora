@@ -94,6 +94,8 @@ const paths = {
   ),
   check: <path d="M5 12.5l4.5 4.5L19 7.5" />,
   chevron: <path d="M6 9l6 6 6-6" />,
+  next: <path d="M9 6l6 6-6 6" />,
+  next: <path d="M9 6l6 6-6 6" />,
 } satisfies Record<string, ReactNode>;
 
 export type IconName = keyof typeof paths;

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Icon, { type IconName } from "@/components/Icon";
-import StatusBadge from "@/components/admin/StatusBadge";
+import RequestList, { type RequestRow } from "@/components/admin/RequestList";
 import { supabaseServer } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Requests" };
@@ -14,25 +14,6 @@ const KIND_TABS: [string, string][] = [
   ["tour", "Tours"],
 ];
 const KIND_ICON: Record<string, IconName> = { stay: "home", ride: "car", tour: "compass" };
-const KIND_NAME: Record<string, string> = { stay: "Stay", ride: "Ride", tour: "Tour" };
-
-type Row = {
-  id: string;
-  reference: string;
-  kind: "stay" | "ride" | "tour";
-  starts_on: string;
-  ends_on: string;
-  full_name: string;
-  status: string;
-  created_at: string;
-  drive_type: "self_drive" | "chauffeured" | null;
-  property: { title: string } | null;
-  vehicle: { title: string } | null;
-  tour: { title: string } | null;
-};
-
-const short = (iso: string) =>
-  new Date(iso + "T00:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "short" });
 
 function href(status: string, kind: string) {
   const p = new URLSearchParams();
@@ -62,7 +43,7 @@ export default async function RequestsPage({
   if (status !== "all") q = q.eq("status", status);
   if (kind !== "all") q = q.eq("kind", kind);
   const { data } = await q;
-  const rows = (data ?? []) as unknown as Row[];
+  const rows = (data ?? []) as unknown as RequestRow[];
 
   return (
     <div className="space-y-8">
@@ -72,7 +53,7 @@ export default async function RequestsPage({
       </div>
 
       <div className="space-y-3">
-        <nav aria-label="Filter by service" className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+        <nav aria-label="Filter by service" className="-mx-5 flex gap-x-6 overflow-x-auto whitespace-nowrap px-5 text-sm sm:mx-0 sm:flex-wrap sm:px-0">
           {KIND_TABS.map(([k, label]) => (
             <Link
               key={k}
@@ -85,7 +66,7 @@ export default async function RequestsPage({
             </Link>
           ))}
         </nav>
-        <nav aria-label="Filter by status" className="flex flex-wrap gap-x-6 gap-y-2 border-b border-line pb-3 text-sm">
+        <nav aria-label="Filter by status" className="-mx-5 flex gap-x-6 overflow-x-auto whitespace-nowrap border-b border-line px-5 pb-3 text-sm sm:mx-0 sm:flex-wrap sm:px-0">
           {STATUS_TABS.map((t) => (
             <Link
               key={t}
@@ -102,50 +83,7 @@ export default async function RequestsPage({
       {rows.length === 0 ? (
         <p className="text-sm text-muted">No requests match these filters.</p>
       ) : (
-        <div className="overflow-x-auto border-y border-line">
-          <table className="w-full min-w-[40rem] text-left text-sm">
-            <thead className="text-xs text-muted">
-              <tr>
-                <th className="py-3 pr-4 font-normal">Reference</th>
-                <th className="py-3 pr-4 font-normal">Guest</th>
-                <th className="py-3 pr-4 font-normal">For</th>
-                <th className="py-3 pr-4 font-normal">Dates</th>
-                <th className="py-3 pr-4 font-normal">Received</th>
-                <th className="py-3 font-normal">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-line">
-              {rows.map((r) => (
-                <tr key={r.id}>
-                  <td className="py-3 pr-4 tracking-wider">
-                    <Link
-                      href={`/admin/requests/${r.id}`}
-                      className="underline decoration-line underline-offset-4 hover:decoration-accent"
-                    >
-                      {r.reference}
-                    </Link>
-                  </td>
-                  <td className="py-3 pr-4">{r.full_name}</td>
-                  <td className="py-3 pr-4">
-                    {r.property?.title ?? r.vehicle?.title ?? r.tour?.title ?? "Removed listing"}
-                    <span className="mt-0.5 flex items-center gap-1.5 text-xs text-muted">
-                      <Icon name={KIND_ICON[r.kind]} size={13} />
-                      {KIND_NAME[r.kind]}
-                      {r.drive_type === "chauffeured" ? ", chauffeured" : ""}
-                    </span>
-                  </td>
-                  <td className="whitespace-nowrap py-3 pr-4">
-                    {r.starts_on === r.ends_on ? short(r.starts_on) : `${short(r.starts_on)} to ${short(r.ends_on)}`}
-                  </td>
-                  <td className="whitespace-nowrap py-3 pr-4 text-muted">
-                    {new Date(r.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
-                  </td>
-                  <td className="py-3"><StatusBadge status={r.status} /></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <RequestList rows={rows} />
       )}
     </div>
   );
