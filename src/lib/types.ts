@@ -40,7 +40,8 @@ export type Vehicle = {
   seats: number;
   transmission: "automatic" | "manual";
   fuel: string | null;
-  price_per_day: number;
+  price_per_day: number | null;
+  chauffeur_price_per_day: number | null;
   driver_option: "self_drive" | "with_driver" | "both";
   driver_fee_per_day: number;
   deposit: number;

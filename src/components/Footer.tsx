@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AnimatedWordmark } from "./Logo";
 import InstallApp from "./InstallApp";
+import { TOURS_READY } from "@/lib/config";
 import { CREDIT_NAME, CREDIT_URL, PHONE_DISPLAY, PHONE_TEL, WHATSAPP_URL } from "@/lib/contact";
 
 export default function Footer() {
@@ -18,6 +19,7 @@ export default function Footer() {
         <nav aria-label="Footer" className="space-y-3 text-sm tracking-widest text-cream/80">
           <Link href="/stays" className="block hover:text-gold">Stays</Link>
           <Link href="/rides" className="block hover:text-gold">Rides</Link>
+          {TOURS_READY && <Link href="/tours" className="block hover:text-gold">Tours</Link>}
         </nav>
 
         <div className="space-y-3 text-sm">

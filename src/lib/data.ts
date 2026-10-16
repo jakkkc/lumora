@@ -206,6 +206,7 @@ export type TourDetail = {
   languages: string[];
   includes: string[];
   excludes: string[];
+  featured: boolean;
   location: { name: string; slug: string } | null;
   listing_images: ListingImage[];
 };
@@ -220,4 +221,15 @@ export async function getTourDetail(slug: string): Promise<TourDetail | null> {
   if (error) console.error("getTourDetail:", error.message);
   if (!data) return null;
   return { ...data, price: Number(data.price) } as TourDetail;
+}
+
+export async function getTours(): Promise<TourDetail[]> {
+  const { data, error } = await supabasePublic()
+    .from("tours")
+    .select(`*, location:locations(name, slug), ${IMAGES}`)
+    .eq("status", "published")
+    .order("sort_order")
+    .order("created_at", { ascending: false });
+  if (error) console.error("getTours:", error.message);
+  return (data ?? []).map((t) => ({ ...t, price: Number(t.price) })) as TourDetail[];
 }

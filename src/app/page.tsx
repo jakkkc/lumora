@@ -4,8 +4,8 @@ import { AnimatedMark } from "@/components/Logo";
 import ListingCard from "@/components/ListingCard";
 import SearchBox from "@/components/search/SearchBox";
 import { TOURS_READY } from "@/lib/config";
-import { getLocations, getRides, getStays } from "@/lib/data";
-import { driverLabel, money, plural, sortImages } from "@/lib/format";
+import { getLocations, getRides, getStays, getTours } from "@/lib/data";
+import { money, plural, sortImages } from "@/lib/format";
 
 export const revalidate = 60;
 
@@ -18,10 +18,15 @@ export const revalidate = 60;
 const RING_LEFT =
   "min(max(616px, calc(100% - 664px)), calc(100% - clamp(87px, calc(25% - 3px), 107px)))";
 
+const BASIS = { per_person: "per person", per_group: "per group", per_day: "per day" } as const;
+
 export default async function Home() {
-  const [stays, rides, locations] = await Promise.all([getStays(), getRides(), getLocations()]);
-  const featuredStays = (stays.some((s) => s.featured) ? stays.filter((s) => s.featured) : stays).slice(0, 3);
-  const featuredRides = (rides.some((r) => r.featured) ? rides.filter((r) => r.featured) : rides).slice(0, 3);
+  const [stays, rides, tours, locations] = await Promise.all([getStays(), getRides(), getTours(), getLocations()]);
+  const pick = <T extends { featured: boolean }>(list: T[]) =>
+    (list.some((x) => x.featured) ? list.filter((x) => x.featured) : list).slice(0, 3);
+  const featuredStays = pick(stays);
+  const featuredRides = pick(rides);
+  const featuredTours = TOURS_READY ? pick(tours) : [];
 
   return (
     <>
@@ -86,15 +91,42 @@ export default async function Home() {
             <Link href="/rides" className="nav-link text-sm tracking-widest">See all rides</Link>
           </div>
           <div className="grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
-            {featuredRides.map((r) => (
+            {featuredRides.map((r) => {
+              const self = r.price_per_day;
+              const chauffeur = r.chauffeur_price_per_day;
+              const options = self !== null && chauffeur !== null ? "self-drive or chauffeured" : self !== null ? "self-drive" : "chauffeured";
+              return (
+                <ListingCard
+                  key={r.id}
+                  href={`/rides/${r.slug}`}
+                  title={r.title}
+                  meta={`${r.seats} seats, ${options}`}
+                  price={money(Math.min(...[self, chauffeur].filter((x): x is number => x !== null)), r.currency)}
+                  unit="per day"
+                  image={sortImages(r.listing_images)[0]}
+                />
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {featuredTours.length > 0 && (
+        <section className="mx-auto max-w-6xl px-5 pb-16 sm:px-8 sm:pb-24" aria-labelledby="home-tours">
+          <div className="mb-10 flex items-end justify-between gap-6">
+            <h2 id="home-tours" className="text-3xl sm:text-4xl">tours</h2>
+            <Link href="/tours" className="nav-link text-sm tracking-widest">See all tours</Link>
+          </div>
+          <div className="grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
+            {featuredTours.map((t) => (
               <ListingCard
-                key={r.id}
-                href={`/rides/${r.slug}`}
-                title={r.title}
-                meta={`${r.seats} seats, ${driverLabel[r.driver_option].toLowerCase()}`}
-                price={money(r.price_per_day, r.currency)}
-                unit="per day"
-                image={sortImages(r.listing_images)[0]}
+                key={t.id}
+                href={`/tours/${t.slug}`}
+                title={t.title}
+                meta={[t.location?.name, t.duration_text].filter(Boolean).join(", ")}
+                price={money(t.price, t.currency)}
+                unit={BASIS[t.price_basis]}
+                image={sortImages(t.listing_images)[0]}
               />
             ))}
           </div>
