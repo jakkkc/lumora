@@ -10,7 +10,7 @@ type Kind = "stay" | "ride" | "tour";
 const CFG: Record<Kind, { table: string; col: string; back: string; href: string; publicBase: string | null }> = {
   stay: { table: "properties", col: "property_id", back: "All stays", href: "/admin/stays", publicBase: "/stays/" },
   ride: { table: "vehicles", col: "vehicle_id", back: "All rides", href: "/admin/rides", publicBase: "/rides/" },
-  tour: { table: "tours", col: "tour_id", back: "All tours", href: "/admin/tours", publicBase: null },
+  tour: { table: "tours", col: "tour_id", back: "All tours", href: "/admin/tours", publicBase: "/tours/" },
 };
 
 export default async function ListingEdit({

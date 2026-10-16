@@ -185,3 +185,39 @@ export async function getRideDetail(slug: string): Promise<RideDetail | null> {
     chauffeur_price_per_day: num(data.chauffeur_price_per_day),
   } as RideDetail;
 }
+
+import type { ListingImage } from "./types";
+
+export type TourDetail = {
+  id: string;
+  slug: string;
+  title: string;
+  tagline: string | null;
+  description: string | null;
+  tour_type: "fixed" | "guide";
+  price: number;
+  price_basis: "per_person" | "per_group" | "per_day";
+  currency: string;
+  duration_text: string | null;
+  meeting_point: string | null;
+  min_people: number;
+  max_group: number;
+  capacity_per_day: number;
+  languages: string[];
+  includes: string[];
+  excludes: string[];
+  location: { name: string; slug: string } | null;
+  listing_images: ListingImage[];
+};
+
+export async function getTourDetail(slug: string): Promise<TourDetail | null> {
+  const { data, error } = await supabasePublic()
+    .from("tours")
+    .select(`*, location:locations(name, slug), ${IMAGES}`)
+    .eq("slug", slug)
+    .eq("status", "published")
+    .maybeSingle();
+  if (error) console.error("getTourDetail:", error.message);
+  if (!data) return null;
+  return { ...data, price: Number(data.price) } as TourDetail;
+}
