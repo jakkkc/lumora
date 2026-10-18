@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import Icon, { type IconName } from "@/components/Icon";
 import RequestActions from "@/components/admin/RequestActions";
 import StatusBadge from "@/components/admin/StatusBadge";
+import PaymentsPanel from "@/components/admin/PaymentsPanel";
 import { waNumber } from "@/lib/contact";
 import { daysBetween, longDate, money } from "@/lib/format";
 import { supabaseServer } from "@/lib/supabase/server";
@@ -299,6 +300,8 @@ export default async function RequestDetail({ params }: { params: Promise<{ id: 
               />
             </>
           )}
+
+          <PaymentsPanel requestId={r.id} />
 
           {r.message && (
             <section aria-labelledby="msg">
