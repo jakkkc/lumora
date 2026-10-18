@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import AdminBottomNav from "@/components/admin/AdminBottomNav";
 import AdminNav from "@/components/admin/AdminNav";
 import { AnimatedWordmark } from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -46,16 +47,17 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <span className="hidden text-sm text-muted sm:inline">admin</span>
           </div>
           <div className="flex items-center gap-4 text-sm">
-            <Link href="/" target="_blank" className="nav-link hidden tracking-widest sm:inline">View site</Link>
+            <Link href="/" target="_blank" className="nav-link hidden tracking-widest md:inline">View site</Link>
             <ThemeToggle />
-            <form action={signOut}>
+            <form action={signOut} className="hidden md:block">
               <button className="tracking-widest transition-colors hover:text-accent-strong">Sign out</button>
             </form>
           </div>
         </div>
         <AdminNav />
       </header>
-      <div className="mx-auto max-w-6xl px-5 py-10 sm:px-8">{children}</div>
+      <div className="mx-auto max-w-6xl px-5 pb-28 pt-10 sm:px-8 md:pb-10">{children}</div>
+      <AdminBottomNav />
     </div>
   );
 }

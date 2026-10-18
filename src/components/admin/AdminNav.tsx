@@ -17,7 +17,7 @@ const links: { href: string; label: string; icon: IconName; exact?: boolean }[] 
 export default function AdminNav() {
   const pathname = usePathname();
   return (
-    <nav aria-label="Admin" className="mx-auto flex max-w-6xl gap-7 overflow-x-auto px-5 pb-3 text-sm tracking-widest sm:px-8">
+    <nav aria-label="Admin" className="mx-auto hidden max-w-6xl gap-7 overflow-x-auto px-8 pb-3 text-sm tracking-widest md:flex">
       {links.map((l) => {
         const active = l.exact ? pathname === l.href : pathname.startsWith(l.href);
         return (

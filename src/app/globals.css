@@ -222,3 +222,26 @@ select option:checked {
 input[type="date"] {
   color-scheme: inherit;
 }
+
+/* phones: bigger, easier fields and buttons. 16px text stops iPhones zooming in when a field is tapped. */
+@media (max-width: 767px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="hidden"]),
+  select,
+  textarea,
+  [role="combobox"] {
+    font-size: 16px;
+    min-height: 48px;
+  }
+  textarea {
+    min-height: 96px;
+  }
+  input[type="checkbox"],
+  input[type="radio"] {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
