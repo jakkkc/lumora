@@ -178,67 +178,98 @@ function RemoveForm({
   );
 }
 
+const fee = (n: number | null) => (n === null ? "not offered" : `KES ${Number(n).toLocaleString("en-KE")}`);
+
+function Fold({
+  icon,
+  title,
+  note,
+  accent,
+  children,
+}: {
+  icon: IconName;
+  title: string;
+  note?: string;
+  accent?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <details className={`group border ${accent ? "border-accent" : "border-line"}`}>
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-4 [&::-webkit-details-marker]:hidden">
+        <span className="flex min-w-0 items-center gap-3">
+          <Icon name={icon} size={20} className="shrink-0" />
+          <span className="min-w-0">
+            <span className="block truncate text-sm">{title}</span>
+            {note && <span className="block truncate text-xs text-muted">{note}</span>}
+          </span>
+        </span>
+        <Icon name="chevron" size={18} className="shrink-0 transition-transform duration-200 group-open:rotate-180" />
+      </summary>
+      <div className="space-y-6 border-t border-line p-4">{children}</div>
+    </details>
+  );
+}
+
 export default function LocationsManager({ locations }: { locations: Loc[] }) {
   return (
-    <div className="space-y-14">
-      <section aria-labelledby="add-loc" className="space-y-4">
-        <h2 id="add-loc" className="text-xl">add a location</h2>
+    <div className="space-y-4">
+      <Fold icon="plus" title="Add a location" accent>
         <LocationForm />
-      </section>
+      </Fold>
 
-      {locations.map((loc) => (
-        <section key={loc.id} className="space-y-6 border-t border-line pt-8" aria-labelledby={`loc-${loc.id}`}>
-          <div className="flex items-center gap-3">
-            <Icon name="pin" size={22} />
-            <h2 id={`loc-${loc.id}`} className="text-2xl">{loc.name}</h2>
-            {!loc.active && <span className="text-xs tracking-wider text-muted">hidden</span>}
-          </div>
+      {locations.map((loc) => {
+        const n = loc.transfer_points.length;
+        return (
+          <Fold
+            key={loc.id}
+            icon="pin"
+            title={loc.name}
+            note={`${n} pickup ${n === 1 ? "point" : "points"}${loc.active ? "" : ", hidden"}`}
+          >
+            <LocationForm loc={loc} />
 
-          <LocationForm loc={loc} />
-
-          <div>
-            <h3 className="text-lg">pickup points</h3>
-            <p className="mb-4 mt-1 max-w-xl text-xs text-muted">
-              Airports and train stations where guests can be met. Fees are per trip, one way, in KES. Leave a fee
-              empty if that service is not offered at that point.
-            </p>
-
-            {loc.transfer_points.length === 0 ? (
-              <p className="text-sm text-muted">No pickup points yet.</p>
-            ) : (
-              <div className="divide-y divide-line border-y border-line">
-                {loc.transfer_points.map((p) => (
-                  <div key={p.id} className="space-y-4 py-5">
-                    <p className="flex items-center gap-2 text-sm">
-                      <Icon name={kindIcon[p.kind]} size={18} />
-                      {p.name}
-                    </p>
-                    <PointForm locationId={loc.id} point={p} />
-                    <RemoveForm
-                      action={deletePoint}
-                      id={p.id}
-                      label="Remove this point"
-                      confirmText={`Remove "${p.name}"?`}
-                    />
-                  </div>
-                ))}
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg">pickup points</h3>
+                <p className="mt-1 text-xs text-muted">
+                  Airports and train stations where guests can be met. Fees are per trip, one way, in KES. Leave a
+                  fee empty if that service is not offered at that point.
+                </p>
               </div>
-            )}
 
-            <div className="mt-8 space-y-4">
-              <h4 className="text-base">add a pickup point</h4>
-              <PointForm locationId={loc.id} />
+              {n === 0 && <p className="text-sm text-muted">No pickup points yet.</p>}
+
+              {loc.transfer_points.map((p) => (
+                <Fold
+                  key={p.id}
+                  icon={kindIcon[p.kind]}
+                  title={p.name}
+                  note={`Stays ${fee(p.stay_fee)}, cars ${fee(p.ride_fee)}${p.active ? "" : ", hidden"}`}
+                >
+                  <PointForm locationId={loc.id} point={p} />
+                  <RemoveForm
+                    action={deletePoint}
+                    id={p.id}
+                    label="Remove this point"
+                    confirmText={`Remove "${p.name}"?`}
+                  />
+                </Fold>
+              ))}
+
+              <Fold icon="plus" title="Add a pickup point" accent>
+                <PointForm locationId={loc.id} />
+              </Fold>
             </div>
-          </div>
 
-          <RemoveForm
-            action={deleteLocation}
-            id={loc.id}
-            label="Delete this location"
-            confirmText={`Delete "${loc.name}" and its pickup points?`}
-          />
-        </section>
-      ))}
+            <RemoveForm
+              action={deleteLocation}
+              id={loc.id}
+              label="Delete this location"
+              confirmText={`Delete "${loc.name}" and its pickup points?`}
+            />
+          </Fold>
+        );
+      })}
     </div>
   );
 }

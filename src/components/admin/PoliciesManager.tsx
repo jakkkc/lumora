@@ -115,31 +115,43 @@ function RemoveForm({ id, title }: { id: string; title: string }) {
 
 export default function PoliciesManager({ service, policies }: { service: string; policies: Policy[] }) {
   return (
-    <div className="space-y-12">
-      {policies.length === 0 ? (
-        <p className="text-sm text-muted">No policies yet. Add the first one below.</p>
-      ) : (
-        <div className="divide-y divide-line border-y border-line">
-          {policies.map((p) => (
-            <div key={p.id} className="space-y-5 py-7">
-              <p className="flex items-center gap-3 text-sm">
-                <Icon name="policy" size={18} />
-                {p.title}
-                {!p.published && <span className="text-xs tracking-wider text-muted">hidden</span>}
-              </p>
-              <PolicyForm service={service} policy={p} />
-              <RemoveForm id={p.id} title={p.title} />
-            </div>
-          ))}
-        </div>
-      )}
+    <div className="space-y-4">
+      {policies.length === 0 && <p className="text-sm text-muted">No policies yet. Add the first one below.</p>}
 
-      <section className="space-y-4" aria-labelledby="add-policy">
-        <h2 id="add-policy" className="inline-flex items-center gap-2 text-xl">
-          <Icon name="plus" size={18} /> add a policy
-        </h2>
-        <PolicyForm service={service} />
-      </section>
+      {policies.map((p) => (
+        <details key={p.id} className="group border border-line">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-4 [&::-webkit-details-marker]:hidden">
+            <span className="flex min-w-0 items-center gap-3">
+              <Icon name="policy" size={20} className="shrink-0" />
+              <span className="min-w-0">
+                <span className="block truncate text-sm">{p.title}</span>
+                <span className="block truncate text-xs text-muted">
+                  {p.published ? "Shown to guests" : "Hidden"}
+                  {p.only_for_similar ? ", only on cars marked or similar" : ""}
+                </span>
+              </span>
+            </span>
+            <Icon name="chevron" size={18} className="shrink-0 transition-transform duration-200 group-open:rotate-180" />
+          </summary>
+          <div className="space-y-5 border-t border-line p-4">
+            <PolicyForm service={service} policy={p} />
+            <RemoveForm id={p.id} title={p.title} />
+          </div>
+        </details>
+      ))}
+
+      <details className="group border border-accent">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-4 [&::-webkit-details-marker]:hidden">
+          <span className="flex items-center gap-3 text-sm">
+            <Icon name="plus" size={20} className="shrink-0" />
+            Add a policy
+          </span>
+          <Icon name="chevron" size={18} className="shrink-0 transition-transform duration-200 group-open:rotate-180" />
+        </summary>
+        <div className="border-t border-line p-4">
+          <PolicyForm service={service} />
+        </div>
+      </details>
     </div>
   );
 }
