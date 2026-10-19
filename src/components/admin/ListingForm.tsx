@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useActionState } from "react";
 import { saveListing, type SaveState } from "@/app/admin/(panel)/listing-actions";
 import ThemedSelect from "@/components/ThemedSelect";
+import FormSection from "./FormSection";
 
 type Kind = "stay" | "ride" | "tour";
 
@@ -64,12 +65,11 @@ function Check({ name, label, hint, checked }: { name: string; label: string; hi
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, open, children }: { title: string; open?: boolean; children: React.ReactNode }) {
   return (
-    <section className="space-y-5">
-      <h2 className="border-b border-line pb-2 text-xl">{title}</h2>
-      <div className="grid gap-5 sm:grid-cols-2">{children}</div>
-    </section>
+    <FormSection title={title} openOnPhone={open}>
+      {children}
+    </FormSection>
   );
 }
 
@@ -90,12 +90,12 @@ export default function ListingForm({
   const noun = kind === "stay" ? "stay" : kind === "ride" ? "car" : "tour";
 
   return (
-    <form action={action} className="space-y-12">
+    <form action={action} className="space-y-3 md:space-y-12">
       <input type="hidden" name="kind" value={kind} />
       {editing && <input type="hidden" name="id" value={String(initial!.id)} />}
       <input type="hidden" name="currency" value={val("currency", "KES")} />
 
-      <Section title="the basics">
+      <Section title="the basics" open>
         <Text name="title" label={kind === "stay" ? "Name of the apartment" : kind === "ride" ? "Name of the car" : "Name of the tour"} required wide defaultValue={val("title")} />
         <Text name="tagline" label="One line tagline" wide defaultValue={val("tagline")} placeholder="A short, inviting line shown under the name" />
 
@@ -141,7 +141,7 @@ export default function ListingForm({
             <Area name="amenities" label="What is included" rows={7} wide defaultValue={list("amenities")} hint="One item per line, for example: Sea-view balcony" />
             <Area name="house_rules" label="House rules" rows={4} wide defaultValue={val("house_rules")} />
           </Section>
-          <Section title="price (KES)">
+          <Section title="price (KES)" open>
             <Text name="price_per_night" label="Price per night" type="number" min={0} required defaultValue={val("price_per_night")} />
           </Section>
           <Section title="airport and SGR transfers">
@@ -198,7 +198,7 @@ export default function ListingForm({
             <Area name="includes" label="What is included" rows={5} defaultValue={list("includes")} hint="One item per line" />
             <Area name="excludes" label="What is not included" rows={5} wide defaultValue={list("excludes")} hint="One item per line, for example: Park entry fees" />
           </Section>
-          <Section title="price (KES)">
+          <Section title="price (KES)" open>
             <Text name="price" label="Price" type="number" min={0} required defaultValue={val("price")} />
             <Pick
               name="price_basis" label="Price is" defaultValue={val("price_basis", "per_person")}
