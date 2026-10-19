@@ -10,6 +10,7 @@ const links: { href: string; label: string; icon: IconName; exact?: boolean }[] 
   { href: "/admin/stays", label: "Stays", icon: "home" },
   { href: "/admin/rides", label: "Rides", icon: "car" },
   { href: "/admin/tours", label: "Tours", icon: "compass" },
+  { href: "/admin/accounts", label: "Accounts", icon: "wallet" },
   { href: "/admin/locations", label: "Locations", icon: "pin" },
   { href: "/admin/policies", label: "Policies", icon: "policy" },
 ];
