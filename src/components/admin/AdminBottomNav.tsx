@@ -10,7 +10,7 @@ const items: { href: string; label: string; icon: IconName; exact?: boolean; als
   { href: "/admin/stays", label: "Stays", icon: "home" },
   { href: "/admin/rides", label: "Rides", icon: "car" },
   { href: "/admin/tours", label: "Tours", icon: "compass" },
-  { href: "/admin/more", label: "More", icon: "menu", also: ["/admin/accounts", "/admin/locations", "/admin/policies"] },
+  { href: "/admin/more", label: "More", icon: "menu", also: ["/admin/accounts", "/admin/notifications", "/admin/locations", "/admin/policies"] },
 ];
 
 export default function AdminBottomNav() {

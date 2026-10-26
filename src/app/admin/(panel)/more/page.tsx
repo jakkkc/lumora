@@ -7,6 +7,7 @@ export const metadata: Metadata = { title: "More" };
 
 const links: { href: string; label: string; note: string; icon: IconName; newTab?: boolean }[] = [
   { href: "/admin/accounts", label: "Accounts", note: "Sales, payments and refunds by date", icon: "wallet" },
+  { href: "/admin/notifications", label: "Notifications", note: "Alerts on this phone", icon: "bell" },
   { href: "/admin/locations", label: "Locations", note: "Places you serve and pickup point fees", icon: "pin" },
   { href: "/admin/policies", label: "Policies", note: "The terms guests see before they request", icon: "policy" },
   { href: "/", label: "View the website", note: "Opens the guest site in a new tab", icon: "home", newTab: true },

@@ -1,4 +1,4 @@
-/* Lumora service worker: offline pages and faster repeat visits.
+/* Lumora service worker: offline pages, faster repeat visits and phone notifications.
    Never stores the admin area or anything private. */
 const VERSION = "lumora-v2";
 const PAGES = `${VERSION}-pages`;
@@ -91,4 +91,49 @@ self.addEventListener("fetch", (event) => {
       })
     );
   }
+});
+
+// A notification arrives from the server.
+self.addEventListener("push", (event) => {
+  let data = {};
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch (e) {
+    data = { title: "Lumora", body: event.data ? event.data.text() : "" };
+  }
+
+  const options = {
+    body: data.body || "",
+    icon: "/pwa-icon/admin-192",
+    badge: "/pwa-icon/admin-192",
+    tag: data.tag || undefined,
+    renotify: Boolean(data.tag),
+    data: { url: data.url || "/admin/requests" },
+  };
+
+  const jobs = [self.registration.showNotification(data.title || "Lumora", options)];
+  if (typeof data.count === "number" && self.navigator && self.navigator.setAppBadge) {
+    jobs.push(self.navigator.setAppBadge(data.count).catch(() => {}));
+  }
+  event.waitUntil(Promise.all(jobs));
+});
+
+// Tapping a notification opens the right page in the admin app.
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const target = (event.notification.data && event.notification.data.url) || "/admin/requests";
+
+  event.waitUntil(
+    (async () => {
+      const list = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+      for (const c of list) {
+        if (c.url.includes("/admin") && "focus" in c) {
+          await c.focus();
+          if ("navigate" in c) await c.navigate(target);
+          return;
+        }
+      }
+      await self.clients.openWindow(target);
+    })()
+  );
 });
