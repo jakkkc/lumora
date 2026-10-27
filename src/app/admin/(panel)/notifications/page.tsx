@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import PushControls from "@/components/admin/PushControls";
-import { pushConfigured } from "@/lib/push";
+import { pushConfigured, vapidPublicKey } from "@/lib/push";
 import { supabaseServer } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Notifications" };
 
-const seen = (v?: string) => (v && v.trim() ? `found, ${v.trim().length} characters` : "MISSING");
+function seen(v?: string) {
+  if (!v || !v.trim()) return "MISSING";
+  const bare = v.replace(/\s+/g, "").length;
+  return v.length === bare ? `found, ${bare} characters` : `found, ${v.length} characters (${bare} without spaces)`;
+}
 
 export default async function NotificationsPage() {
   const sb = await supabaseServer();
@@ -33,15 +37,11 @@ export default async function NotificationsPage() {
       </div>
 
       <p className="text-xs text-muted">
-        Server check: public key {seen(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY)}, private key{" "}
-        {seen(process.env.VAPID_PRIVATE_KEY)}, contact email {seen(process.env.VAPID_SUBJECT)}.
+        Server check: public key {seen(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY)} (should be 87), private key{" "}
+        {seen(process.env.VAPID_PRIVATE_KEY)} (should be 43), contact email {seen(process.env.VAPID_SUBJECT)}.
       </p>
 
-      <PushControls
-        publicKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? null}
-        serverReady={pushConfigured()}
-        devices={devices}
-      />
+      <PushControls publicKey={vapidPublicKey()} serverReady={pushConfigured()} devices={devices} />
     </div>
   );
 }

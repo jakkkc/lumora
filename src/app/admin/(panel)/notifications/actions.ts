@@ -70,11 +70,16 @@ export async function sendTest(): Promise<PushState> {
   revalidatePath("/admin/notifications");
 
   if (r.sent === 0) {
-    return {
-      error: r.gone.length > 0
-        ? "That phone is no longer reachable and was removed. Turn notifications on again."
-        : "The notification could not be delivered. Please try again.",
-    };
+    const why = r.reasons[0] ? ` (${r.reasons[0]})` : "";
+    if (r.gone.length > 0 && r.failed === 0) {
+      return { error: "That phone is no longer reachable and was removed. Turn notifications on again." };
+    }
+    if (/\b(401|403)\b/.test(r.reasons[0] ?? "")) {
+      return {
+        error: `The keys on the server do not match the ones this phone signed up with${why}. On this phone, turn notifications off, then on again, and send the test again.`,
+      };
+    }
+    return { error: `The notification could not be delivered${why}.` };
   }
   return { ok: true, message: `Sent to ${r.sent} ${r.sent === 1 ? "phone" : "phones"}. It should arrive in a few seconds.` };
 }
