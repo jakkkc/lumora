@@ -5,6 +5,8 @@ import { supabaseServer } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Notifications" };
 
+const seen = (v?: string) => (v && v.trim() ? `found, ${v.trim().length} characters` : "MISSING");
+
 export default async function NotificationsPage() {
   const sb = await supabaseServer();
   const { data } = await sb.from("push_subscriptions").select("endpoint, label, created_at").order("created_at");
@@ -29,6 +31,12 @@ export default async function NotificationsPage() {
           for new requests come in the next steps. For now, turn them on and send a test.
         </p>
       </div>
+
+      <p className="text-xs text-muted">
+        Server check: public key {seen(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY)}, private key{" "}
+        {seen(process.env.VAPID_PRIVATE_KEY)}, contact email {seen(process.env.VAPID_SUBJECT)}.
+      </p>
+
       <PushControls
         publicKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? null}
         serverReady={pushConfigured()}
