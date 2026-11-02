@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Icon from "@/components/Icon";
-import { removeSubscription, saveSubscription, sendTest } from "@/app/admin/(panel)/notifications/actions";
+import { removeSubscription, saveSubscription } from "@/app/admin/(panel)/notifications/actions";
 
 type Device = { endpoint: string; label: string | null; added: string };
 type Support = "checking" | "ready" | "unsupported" | "ios-install" | "no-worker";
@@ -131,14 +131,6 @@ export default function PushControls({
     }
   }
 
-  async function test() {
-    setBusy(true);
-    setMsg(null);
-    const r = await sendTest();
-    setMsg(r.error ? { text: r.error, bad: true } : { text: r.message ?? "Sent." });
-    setBusy(false);
-  }
-
   async function removeDevice(endpoint: string) {
     setBusy(true);
     await removeSubscription(endpoint);
@@ -190,9 +182,6 @@ export default function PushControls({
           <div className="flex flex-wrap gap-3">
             {on ? (
               <>
-                <button type="button" onClick={test} disabled={busy} className={primary}>
-                  Send a test notification
-                </button>
                 <button type="button" onClick={turnOff} disabled={busy} className={quiet}>
                   Turn off on this phone
                 </button>

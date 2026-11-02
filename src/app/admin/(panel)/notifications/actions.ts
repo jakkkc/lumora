@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { pushConfigured, sendPush } from "@/lib/push";
 import { supabaseServer } from "@/lib/supabase/server";
 
 export type PushState = { ok?: boolean; error?: string; message?: string };
@@ -48,38 +47,3 @@ export async function removeSubscription(endpoint: string): Promise<PushState> {
   return { ok: true };
 }
 
-export async function sendTest(): Promise<PushState> {
-  if (!pushConfigured()) {
-    return { error: "The server does not have its notification keys yet. Add the three keys, then try again." };
-  }
-  const sb = await signedIn();
-  if (!sb) return { error: "Please sign in again." };
-
-  const { data } = await sb.from("push_subscriptions").select("endpoint, p256dh, auth");
-  const subs = (data ?? []) as { endpoint: string; p256dh: string; auth: string }[];
-  if (subs.length === 0) return { error: "No phone is signed up yet. Turn notifications on first." };
-
-  const r = await sendPush(subs, {
-    title: "Lumora test",
-    body: "Notifications are working on this phone.",
-    url: "/admin/notifications",
-    tag: "lumora-test",
-  });
-
-  if (r.gone.length > 0) await sb.from("push_subscriptions").delete().in("endpoint", r.gone);
-  revalidatePath("/admin/notifications");
-
-  if (r.sent === 0) {
-    const why = r.reasons[0] ? ` (${r.reasons[0]})` : "";
-    if (r.gone.length > 0 && r.failed === 0) {
-      return { error: "That phone is no longer reachable and was removed. Turn notifications on again." };
-    }
-    if (/\b(401|403)\b/.test(r.reasons[0] ?? "")) {
-      return {
-        error: `The keys on the server do not match the ones this phone signed up with${why}. On this phone, turn notifications off, then on again, and send the test again.`,
-      };
-    }
-    return { error: `The notification could not be delivered${why}.` };
-  }
-  return { ok: true, message: `Sent to ${r.sent} ${r.sent === 1 ? "phone" : "phones"}. It should arrive in a few seconds.` };
-}

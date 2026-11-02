@@ -5,11 +5,12 @@ import { supabaseServer } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Notifications" };
 
-function seen(v?: string) {
-  if (!v || !v.trim()) return "MISSING";
-  const bare = v.replace(/\s+/g, "").length;
-  return v.length === bare ? `found, ${bare} characters` : `found, ${v.length} characters (${bare} without spaces)`;
-}
+const alerts: [string, string][] = [
+  ["New request", "As soon as a guest sends one."],
+  ["A request is waiting", "A reminder when one has gone 3 hours without an answer. Only between 7 am and 9 pm."],
+  ["Tomorrow", "At 5 pm, the check-ins, pick-ups and tours for the next day."],
+  ["Good morning", "At 7:30 am, what is new, what starts and ends today, and balances still owed."],
+];
 
 export default async function NotificationsPage() {
   const sb = await supabaseServer();
@@ -27,19 +28,25 @@ export default async function NotificationsPage() {
   }));
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       <div>
         <h1 className="text-3xl">notifications</h1>
         <p className="mt-2 max-w-xl text-sm text-muted">
-          Get an alert on your phone when something needs you. Turn them on for each phone you use. Automatic alerts
-          for new requests come in the next steps. For now, turn them on and send a test.
+          Get an alert on your phone when something needs you. Turn them on for each phone you use.
         </p>
       </div>
 
-      <p className="text-xs text-muted">
-        Server check: public key {seen(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY)} (should be 87), private key{" "}
-        {seen(process.env.VAPID_PRIVATE_KEY)} (should be 43), contact email {seen(process.env.VAPID_SUBJECT)}.
-      </p>
+      <section aria-labelledby="what">
+        <h2 id="what" className="mb-3 text-xl">what you will get</h2>
+        <ul className="divide-y divide-line border-y border-line">
+          {alerts.map(([title, note]) => (
+            <li key={title} className="py-3 text-sm">
+              <p>{title}</p>
+              <p className="text-xs text-muted">{note}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <PushControls publicKey={vapidPublicKey()} serverReady={pushConfigured()} devices={devices} />
     </div>
