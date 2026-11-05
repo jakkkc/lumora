@@ -17,7 +17,7 @@ export default function SiteChrome({
   return (
     <>
       {!admin && header}
-      <main className="flex-1">{children}</main>
+      <main className={admin ? "flex-1" : "flex-1 soft"}>{children}</main>
       {!admin && footer}
     </>
   );

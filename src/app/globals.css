@@ -245,3 +245,78 @@ input[type="date"] {
     min-width: 44px;
   }
 }
+
+/* ---------- a softer, friendlier look for the guest site ---------- */
+.soft-card {
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+}
+
+.lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 40px -26px rgb(27 42 65 / 0.55);
+  border-color: var(--accent);
+}
+
+.soft input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="hidden"]),
+.soft select,
+.soft textarea,
+.soft [role="combobox"] {
+  border-radius: 0.75rem;
+}
+.soft [role="listbox"] {
+  border-radius: 0.75rem;
+}
+.soft button.bg-accent,
+.soft a.bg-accent,
+.soft button.border-accent,
+.soft a.border-accent {
+  border-radius: 9999px;
+}
+.soft [role="group"].inline-flex {
+  border-radius: 9999px;
+  overflow: hidden;
+}
+.soft button:active:not(:disabled),
+.soft a.bg-accent:active {
+  transform: scale(0.98);
+}
+
+@keyframes soft-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+.soft > * {
+  animation: soft-rise 0.6s cubic-bezier(0.2, 0.6, 0.2, 1) both;
+}
+
+/* the ring that draws itself on the thank-you screen */
+.ok-ring {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: ok-draw 1.1s cubic-bezier(0.45, 0, 0.25, 1) 0.1s forwards;
+}
+.ok-dot {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ok-pop 0.5s ease-out 0.9s both;
+}
+.ok-badge {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ok-pop 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) 1.15s both;
+}
+@keyframes ok-draw { to { stroke-dashoffset: 0; } }
+@keyframes ok-pop {
+  from { opacity: 0; transform: scale(0); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .soft > *, .ok-ring, .ok-dot, .ok-badge { animation: none !important; }
+  .ok-ring { stroke-dashoffset: 0; }
+  .lift { transition: none !important; }
+}

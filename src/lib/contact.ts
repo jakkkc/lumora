@@ -18,3 +18,6 @@ export function waNumber(phone: string) {
   else if (d.length === 9 && /^[17]/.test(d)) d = "254" + d;
   return d;
 }
+
+// Shown to guests after they send a request. Change this to what you can really promise.
+export const REPLY_NOTE = "Usually within a few hours.";

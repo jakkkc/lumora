@@ -90,7 +90,7 @@ export default function SearchBox({ locations, toursReady, initial, compact = fa
     <form
       onSubmit={submit}
       aria-label="Search"
-      className={compact ? "border border-line p-4 sm:p-5" : "border border-line bg-bg p-4 sm:p-5"}
+      className={compact ? "soft-card p-4 sm:p-5" : "soft-card bg-bg p-4 sm:p-5"}
     >
       {mode === "navigate" ? (
         <nav aria-label="What are you looking for" className="mb-5 flex flex-wrap gap-x-7 gap-y-2 border-b border-line">

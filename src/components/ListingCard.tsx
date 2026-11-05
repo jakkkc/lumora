@@ -15,7 +15,7 @@ type Props = {
 export default function ListingCard({ href, title, meta, price, unit, image }: Props) {
   return (
     <Link href={href} className="group block">
-      <div className="relative aspect-[4/5] overflow-hidden bg-surface">
+      <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-surface">
         {image ? (
           <Image
             src={imageUrl(image.path)}

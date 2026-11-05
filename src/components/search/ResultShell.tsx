@@ -20,7 +20,7 @@ type Props = {
 
 export default function ResultShell(p: Props) {
   return (
-    <article className="grid gap-5 border border-line p-5 sm:grid-cols-[1fr_13rem] sm:p-6">
+    <article className="soft-card lift grid gap-5 p-5 sm:grid-cols-[1fr_13rem] sm:p-6">
       <div className="order-2 flex flex-col sm:order-1">
         <h3 className="text-xl tracking-wide">
           <Link href={p.href} className="transition-colors hover:text-accent-strong">{p.title}</Link>
@@ -51,7 +51,7 @@ export default function ResultShell(p: Props) {
         href={p.href}
         tabIndex={-1}
         aria-hidden="true"
-        className="relative order-1 block aspect-[4/3] overflow-hidden bg-surface sm:order-2 sm:aspect-auto sm:min-h-[9rem]"
+        className="relative order-1 block aspect-[4/3] overflow-hidden rounded-2xl bg-surface sm:order-2 sm:aspect-auto sm:min-h-[9rem]"
       >
         {p.image ? (
           <Image

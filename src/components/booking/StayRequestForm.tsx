@@ -70,7 +70,7 @@ export default function StayRequestForm(p: Props) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="border border-line p-6" aria-labelledby="request-title">
+    <form onSubmit={onSubmit} className="soft-card p-6" aria-labelledby="request-title">
       <p id="request-title" className="text-2xl tracking-wide">{money(p.price, p.currency)}</p>
       <p className="text-sm text-muted">per night</p>
 

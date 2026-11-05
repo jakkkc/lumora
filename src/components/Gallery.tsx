@@ -12,7 +12,7 @@ export default function Gallery({ images, title }: { images: Img[]; title: strin
 
   if (images.length === 0) {
     return (
-      <div className="grid aspect-[4/3] place-items-center bg-surface" aria-hidden="true">
+      <div className="grid aspect-[4/3] place-items-center rounded-2xl bg-surface" aria-hidden="true">
         <Mark className="h-32 w-32 text-accent opacity-30" />
       </div>
     );
@@ -22,7 +22,7 @@ export default function Gallery({ images, title }: { images: Img[]; title: strin
 
   return (
     <div>
-      <div className="relative aspect-[4/3] overflow-hidden bg-surface">
+      <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-surface">
         <Image
           key={current.path}
           src={imageUrl(current.path)}
@@ -42,7 +42,7 @@ export default function Gallery({ images, title }: { images: Img[]; title: strin
               onClick={() => setI(n)}
               aria-label={`Show photo ${n + 1} of ${images.length}`}
               aria-current={n === i}
-              className={`relative aspect-[4/3] overflow-hidden bg-surface transition-opacity ${
+              className={`relative aspect-[4/3] overflow-hidden rounded-xl bg-surface transition-opacity ${
                 n === i ? "opacity-100 ring-1 ring-accent" : "opacity-60 hover:opacity-100"
               }`}
             >
