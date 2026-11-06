@@ -6,6 +6,8 @@ import ThemedSelect from "@/components/ThemedSelect";
 import { addDays, diffDays, eachDay, niceDate, toRanges } from "@/lib/dates";
 import { money, plural } from "@/lib/format";
 import ContactFields from "./ContactFields";
+import Extras from "./Extras";
+import StepTitle from "./StepTitle";
 import DeliveryBlock, { type DeliveryPoint, type DeliveryValue } from "./DeliveryBlock";
 import SuccessPanel from "./SuccessPanel";
 
@@ -111,7 +113,8 @@ export default function RideRequestForm(p: Props) {
         <p className="mt-5 text-sm text-muted">{p.selfPrice !== null ? "Self-drive" : "Chauffeured only"}</p>
       )}
 
-      <div className="mt-5 grid grid-cols-2 gap-3">
+      <StepTitle n={1} title="your dates" />
+      <div className="grid grid-cols-2 gap-3">
         <div>
           <label htmlFor="starts_on" className={lab}>Pick-up</label>
           <input
@@ -154,7 +157,7 @@ export default function RideRequestForm(p: Props) {
       </div>
 
       {p.deliveryEnabled && (
-        <div className="mt-5 space-y-4">
+        <Extras n={2} title="extras, only if you like" hint="Have the car delivered or collected where you like">
           <DeliveryBlock
             name="pickup" title="GETTING THE CAR" timeLabel="Delivery time"
             labels={{ none: "Collect the car from us", point: "Deliver to the airport or SGR", custom: "Deliver to a place I choose" }}
@@ -168,9 +171,10 @@ export default function RideRequestForm(p: Props) {
           {needsPin && (
             <p className="text-xs text-muted">Please drop a pin on the map for the place you chose.</p>
           )}
-        </div>
+        </Extras>
       )}
 
+      <StepTitle n={p.deliveryEnabled ? 3 : 2} title="a little about you" />
       <ContactFields
         pending={pending}
         error={state.error}

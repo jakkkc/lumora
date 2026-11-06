@@ -4,6 +4,7 @@ import Gallery from "@/components/Gallery";
 import Facts from "@/components/Facts";
 import ItemList from "@/components/ItemList";
 import PolicyList from "@/components/booking/PolicyList";
+import HowItWorks from "@/components/booking/HowItWorks";
 import TourRequestForm from "@/components/booking/TourRequestForm";
 import { getFullDays, getPolicies, getTourDetail } from "@/lib/data";
 import { plural, sortImages } from "@/lib/format";
@@ -88,6 +89,7 @@ export default async function TourPage({ params, searchParams }: Props) {
         </div>
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
+          <HowItWorks />
           <TourRequestForm
             listingId={tour.id}
             title={tour.title}

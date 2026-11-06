@@ -4,6 +4,7 @@ import Gallery from "@/components/Gallery";
 import Facts from "@/components/Facts";
 import ItemList from "@/components/ItemList";
 import PolicyList from "@/components/booking/PolicyList";
+import HowItWorks from "@/components/booking/HowItWorks";
 import RideRequestForm from "@/components/booking/RideRequestForm";
 import { getFullDays, getPolicies, getRideDetail, getTransferPoints } from "@/lib/data";
 import { money, plural, sortImages } from "@/lib/format";
@@ -89,6 +90,7 @@ export default async function RidePage({ params, searchParams }: Props) {
         </div>
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
+          <HowItWorks />
           <RideRequestForm
             listingId={ride.id}
             title={ride.title}

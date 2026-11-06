@@ -6,6 +6,7 @@ import ThemedSelect from "@/components/ThemedSelect";
 import { addDays, diffDays, eachDay, niceDate, toRanges } from "@/lib/dates";
 import { money, plural } from "@/lib/format";
 import ContactFields from "./ContactFields";
+import StepTitle from "./StepTitle";
 import SuccessPanel from "./SuccessPanel";
 
 type Props = {
@@ -94,7 +95,8 @@ export default function TourRequestForm(p: Props) {
       <input type="hidden" name="listing_id" value={p.listingId} />
       {!guide && <input type="hidden" name="ends_on" value={start} />}
 
-      <div className={`mt-6 grid gap-3 ${guide ? "grid-cols-2" : "grid-cols-1"}`}>
+      <StepTitle n={1} title={guide ? "your dates" : "your date"} />
+      <div className={`grid gap-3 ${guide ? "grid-cols-2" : "grid-cols-1"}`}>
         <div>
           <label htmlFor="starts_on" className={lab}>{guide ? "From" : "Date"}</label>
           <input
@@ -140,6 +142,7 @@ export default function TourRequestForm(p: Props) {
         />
       </div>
 
+      <StepTitle n={2} title="a little about you" />
       <ContactFields
         pending={pending}
         error={state.error}

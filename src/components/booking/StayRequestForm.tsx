@@ -6,6 +6,8 @@ import ThemedSelect from "@/components/ThemedSelect";
 import { diffDays, eachDay, niceDate, toRanges } from "@/lib/dates";
 import { money, plural } from "@/lib/format";
 import ContactFields from "./ContactFields";
+import Extras from "./Extras";
+import StepTitle from "./StepTitle";
 import SuccessPanel from "./SuccessPanel";
 import TransferBlock, { type TransferPoint, type TransferValue } from "./TransferBlock";
 
@@ -77,7 +79,8 @@ export default function StayRequestForm(p: Props) {
       <input type="hidden" name="kind" value="stay" />
       <input type="hidden" name="listing_id" value={p.listingId} />
 
-      <div className="mt-6 grid grid-cols-2 gap-3">
+      <StepTitle n={1} title="your dates" />
+      <div className="grid grid-cols-2 gap-3">
         <div>
           <label htmlFor="starts_on" className={lab}>Check-in</label>
           <input
@@ -119,8 +122,7 @@ export default function StayRequestForm(p: Props) {
       </div>
 
       {p.points.length > 0 && (
-        <div className="mt-5 space-y-4">
-          <p className="text-xs tracking-widest text-muted">AIRPORT AND SGR TRANSFERS</p>
+        <Extras n={2} title="extras, only if you like" hint="Airport or SGR pickup and drop off">
           <TransferBlock
             name="pickup" title="Pickup on arrival" timeLabel="Arrival time"
             points={p.points} value={pickup} onChange={setPickup} currency={p.currency}
@@ -129,9 +131,10 @@ export default function StayRequestForm(p: Props) {
             name="dropoff" title="Drop off on departure" timeLabel="Departure time"
             points={p.points} value={dropoff} onChange={setDropoff} currency={p.currency}
           />
-        </div>
+        </Extras>
       )}
 
+      <StepTitle n={p.points.length > 0 ? 3 : 2} title="a little about you" />
       <ContactFields
         pending={pending}
         error={state.error}

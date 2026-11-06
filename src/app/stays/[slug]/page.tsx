@@ -4,6 +4,7 @@ import Gallery from "@/components/Gallery";
 import Facts from "@/components/Facts";
 import ItemList from "@/components/ItemList";
 import PolicyList from "@/components/booking/PolicyList";
+import HowItWorks from "@/components/booking/HowItWorks";
 import StayRequestForm from "@/components/booking/StayRequestForm";
 import { getFullDays, getPolicies, getStayDetail, getTransferPoints } from "@/lib/data";
 import { plural, sortImages } from "@/lib/format";
@@ -77,6 +78,7 @@ export default async function StayPage({ params, searchParams }: Props) {
         </div>
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
+          <HowItWorks />
           <StayRequestForm
             listingId={stay.id}
             title={stay.title}
