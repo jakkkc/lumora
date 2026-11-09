@@ -23,7 +23,7 @@ function Seg({
         {options.map(([v, l]) => (
           <button
             key={v || "any"} type="button" aria-pressed={value === v} onClick={() => onPick(v)}
-            className={`border px-3 py-2 text-xs transition-colors ${
+            className={`rounded-full border px-3 py-2 text-xs transition-colors ${
               value === v ? "border-accent bg-accent/15 text-fg" : "border-line text-muted hover:border-accent hover:text-fg"
             }`}
           >
@@ -45,6 +45,7 @@ export default function SearchFilters({ type, categories, priceMin, priceMax, cu
   useEffect(() => setPrice(Number(sp.get("max")) || priceMax), [sp, priceMax]);
 
   const cats = (sp.get("cat") ?? "").split(",").filter(Boolean);
+  const active = ["max", "cat", "seats", "beds", "guests", "ttype"].filter((k) => sp.get(k)).length;
 
   function update(changes: Record<string, string | null>) {
     const p = new URLSearchParams(sp.toString());
@@ -68,13 +69,13 @@ export default function SearchFilters({ type, categories, priceMin, priceMax, cu
         type="button"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
-        className="inline-flex items-center gap-2 border border-line px-5 py-3 text-sm tracking-widest lg:hidden"
+        className="inline-flex items-center gap-2 rounded-full border border-line px-5 py-3 text-sm tracking-widest lg:hidden"
       >
         <Icon name={open ? "close" : "filter"} size={16} />
-        {open ? "Hide filters" : "Filters"}
+        {open ? "Hide filters" : active > 0 ? "Filters (" + active + ")" : "Filters"}
       </button>
 
-      <div className={`${open ? "mt-4 block" : "hidden"} space-y-8 border border-line p-5 lg:mt-0 lg:block`}>
+      <div className={`${open ? "mt-4 block" : "hidden"} soft-card space-y-8 p-5 lg:mt-0 lg:block`}>
         <div className="flex items-center justify-between">
           <h2 className="text-lg">filters</h2>
           <button

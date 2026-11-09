@@ -8,6 +8,7 @@ import RideRow from "./RideRow";
 import { StayRow, TourRow } from "./ResultRows";
 import SearchBox from "./SearchBox";
 import SearchFilters from "./SearchFilters";
+import { AnimatedMark } from "@/components/Logo";
 
 const WORD: Record<SearchType, string> = { stay: "stays", ride: "rides", tour: "tours" };
 const NOUN: Record<SearchType, [string, string]> = { stay: ["stay", "stays"], ride: ["car", "cars"], tour: ["tour", "tours"] };
@@ -83,31 +84,43 @@ export default async function ResultsPage({
             {q.hasDates ? ` from ${short(q.from)} to ${short(q.to)}` : ""}
           </p>
           {!q.hasDates && (
-            <p className="mt-1 text-xs text-muted">Add your dates above to see only what is free.</p>
+            <p className="mt-3 flex items-center gap-3 rounded-2xl bg-surface px-4 py-3 text-sm">
+              <span className="h-2 w-2 shrink-0 rounded-full bg-gold" aria-hidden="true" />
+              Add your dates above to see only what is free.
+            </p>
           )}
 
           {count === 0 ? (
-            <div className="mt-8 space-y-4 border border-line p-6">
-              <p className="font-serif text-xl italic">
-                {q.hasDates ? "Nothing is free for those dates." : "Nothing matches these filters."}
+            <div className="soft-card mt-8 p-8 text-center">
+              <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-surface">
+                <AnimatedMark className="h-9 w-9 text-accent opacity-70" />
+              </div>
+              <p className="mt-5 font-serif text-xl italic">
+                {q.hasDates ? "Nothing is free for those dates." : "Nothing matches those filters."}
               </p>
-              <p className="text-sm text-muted">
-                Try different dates, another location, or clear the filters. You can also message us and we will
-                help you find something.
+              <p className="mx-auto mt-2 max-w-sm text-sm text-muted">
+                {q.hasDates
+                  ? "Try other dates, or look without dates and decide later."
+                  : "Try clearing the filters, or look somewhere else."}
               </p>
-              <a
-                href={WHATSAPP_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block border border-accent px-5 py-2.5 text-sm tracking-widest transition-colors hover:bg-accent/15"
-              >
-                Message us on WhatsApp
-              </a>
-              <p>
-                <Link href={`/${WORD[type]}`} className="text-sm underline decoration-line underline-offset-4 hover:decoration-accent">
-                  Start a new search
-                </Link>
-              </p>
+              <div className="mt-6 flex flex-wrap justify-center gap-3 text-sm tracking-widest">
+                {q.hasDates && (
+                  <Link
+                    href={"/" + WORD[type] + (q.location ? "?location=" + q.location : "")}
+                    className="border border-accent px-5 py-2.5 transition-colors hover:bg-accent/15"
+                  >
+                    Look without dates
+                  </Link>
+                )}
+                <a
+                  href={WHATSAPP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-accent px-5 py-2.5 text-on-accent transition-opacity hover:opacity-90"
+                >
+                  Ask us on WhatsApp
+                </a>
+              </div>
             </div>
           ) : (
             <div className="mt-8 space-y-12">
