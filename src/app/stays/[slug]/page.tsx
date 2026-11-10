@@ -5,9 +5,10 @@ import Facts from "@/components/Facts";
 import ItemList from "@/components/ItemList";
 import PolicyList from "@/components/booking/PolicyList";
 import HowItWorks from "@/components/booking/HowItWorks";
+import StickyRequestBar from "@/components/booking/StickyRequestBar";
 import StayRequestForm from "@/components/booking/StayRequestForm";
 import { getFullDays, getPolicies, getStayDetail, getTransferPoints } from "@/lib/data";
-import { plural, sortImages } from "@/lib/format";
+import { money, plural, sortImages } from "@/lib/format";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -77,8 +78,9 @@ export default async function StayPage({ params, searchParams }: Props) {
           <PolicyList policies={policies} />
         </div>
 
-        <aside className="lg:sticky lg:top-24 lg:self-start">
+        <aside id="request" className="scroll-mt-24 lg:sticky lg:top-24 lg:self-start">
           <HowItWorks />
+          <StickyRequestBar price={money(stay.price_per_night, stay.currency)} unit="per night" label="Request this stay" />
           <StayRequestForm
             listingId={stay.id}
             title={stay.title}

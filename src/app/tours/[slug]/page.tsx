@@ -5,9 +5,10 @@ import Facts from "@/components/Facts";
 import ItemList from "@/components/ItemList";
 import PolicyList from "@/components/booking/PolicyList";
 import HowItWorks from "@/components/booking/HowItWorks";
+import StickyRequestBar from "@/components/booking/StickyRequestBar";
 import TourRequestForm from "@/components/booking/TourRequestForm";
 import { getFullDays, getPolicies, getTourDetail } from "@/lib/data";
-import { plural, sortImages } from "@/lib/format";
+import { money, plural, sortImages } from "@/lib/format";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -88,8 +89,9 @@ export default async function TourPage({ params, searchParams }: Props) {
           <PolicyList policies={policies} />
         </div>
 
-        <aside className="lg:sticky lg:top-24 lg:self-start">
+        <aside id="request" className="scroll-mt-24 lg:sticky lg:top-24 lg:self-start">
           <HowItWorks />
+          <StickyRequestBar price={money(tour.price, tour.currency)} unit={{ per_person: "per person", per_group: "per group", per_day: "per day" }[tour.price_basis]} label={tour.tour_type === "guide" ? "Request this guide" : "Request this tour"} />
           <TourRequestForm
             listingId={tour.id}
             title={tour.title}

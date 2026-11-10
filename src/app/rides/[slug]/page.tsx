@@ -5,6 +5,7 @@ import Facts from "@/components/Facts";
 import ItemList from "@/components/ItemList";
 import PolicyList from "@/components/booking/PolicyList";
 import HowItWorks from "@/components/booking/HowItWorks";
+import StickyRequestBar from "@/components/booking/StickyRequestBar";
 import RideRequestForm from "@/components/booking/RideRequestForm";
 import { getFullDays, getPolicies, getRideDetail, getTransferPoints } from "@/lib/data";
 import { money, plural, sortImages } from "@/lib/format";
@@ -89,8 +90,9 @@ export default async function RidePage({ params, searchParams }: Props) {
           <PolicyList policies={policies} />
         </div>
 
-        <aside className="lg:sticky lg:top-24 lg:self-start">
+        <aside id="request" className="scroll-mt-24 lg:sticky lg:top-24 lg:self-start">
           <HowItWorks />
+          <StickyRequestBar price={money(ride.price_per_day ?? ride.chauffeur_price_per_day ?? 0, ride.currency)} unit="per day" label="Request this car" />
           <RideRequestForm
             listingId={ride.id}
             title={ride.title}
