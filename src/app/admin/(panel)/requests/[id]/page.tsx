@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Icon, { type IconName } from "@/components/Icon";
-import RequestActions from "@/components/admin/RequestActions";
-import StatusBadge from "@/components/admin/StatusBadge";
+import NextStep from "@/components/admin/NextStep";
 import PaymentsPanel from "@/components/admin/PaymentsPanel";
+import PriceAndNotes from "@/components/admin/PriceAndNotes";
 import { waNumber } from "@/lib/contact";
 import { daysBetween, longDate, money } from "@/lib/format";
 import { supabaseServer } from "@/lib/supabase/server";
@@ -73,11 +73,10 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
   );
 }
 
-function baseEstimate(r: Req): { amount: number; note: string; currency: string } | null {
+function baseEstimate(r: Req): { amount: number; currency: string } | null {
   const span = daysBetween(r.starts_on, r.ends_on);
   if (r.kind === "stay" && r.property) {
-    const n = Math.max(span, 1);
-    return { amount: n * r.property.price_per_night, note: `${n} night${n === 1 ? "" : "s"}`, currency: r.property.currency };
+    return { amount: Math.max(span, 1) * r.property.price_per_night, currency: r.property.currency };
   }
   if (r.kind === "ride" && r.vehicle) {
     const v = r.vehicle;
@@ -86,22 +85,13 @@ function baseEstimate(r: Req): { amount: number; note: string; currency: string 
     const rate = chauffeured
       ? (v.chauffeur_price_per_day ?? (v.price_per_day ?? 0) + v.driver_fee_per_day)
       : (v.price_per_day ?? 0);
-    return {
-      amount: days * rate,
-      note: `${days} day${days === 1 ? "" : "s"}, ${chauffeured ? "chauffeured" : "self-drive"}`,
-      currency: v.currency,
-    };
+    return { amount: days * rate, currency: v.currency };
   }
   if (r.kind === "tour" && r.tour) {
     const t = r.tour;
-    if (t.price_basis === "per_person") {
-      return { amount: r.guests * t.price, note: `${r.guests} ${r.guests === 1 ? "person" : "people"}`, currency: t.currency };
-    }
-    if (t.price_basis === "per_day") {
-      const days = span + 1;
-      return { amount: days * t.price, note: `${days} day${days === 1 ? "" : "s"}`, currency: t.currency };
-    }
-    return { amount: t.price, note: "per group", currency: t.currency };
+    if (t.price_basis === "per_person") return { amount: r.guests * t.price, currency: t.currency };
+    if (t.price_basis === "per_day") return { amount: (span + 1) * t.price, currency: t.currency };
+    return { amount: t.price, currency: t.currency };
   }
   return null;
 }
@@ -191,8 +181,7 @@ export default async function RequestDetail({ params }: { params: Promise<{ id: 
   const isRide = r.kind === "ride";
 
   const base = baseEstimate(r);
-  const fees = (r.pickup_fee ?? 0) + (r.dropoff_fee ?? 0);
-  const estimate = base ? base.amount + fees : null;
+  const suggested = base ? Math.round(base.amount + (r.pickup_fee ?? 0) + (r.dropoff_fee ?? 0)) : null;
 
   const wa = waNumber(r.phone);
   const first = r.full_name.split(" ")[0];
@@ -204,22 +193,20 @@ export default async function RequestDetail({ params }: { params: Promise<{ id: 
   const showTransfers = isStay || isRide || r.pickup_mode !== "none" || r.dropoff_mode !== "none";
   const pickupTitle = isRide ? "Car delivery" : "Pickup on arrival";
   const dropoffTitle = isRide ? "Car collection" : "Drop off on departure";
-
   const chauffeured = r.drive_type === "chauffeured" || (r.drive_type === null && r.with_driver);
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       <div>
         <Link href="/admin/requests" className="nav-link text-sm tracking-widest">All requests</Link>
-        <div className="mt-5 flex flex-wrap items-center gap-4">
-          <h1 className="text-3xl tracking-widest">{r.reference}</h1>
-          <StatusBadge status={r.status} />
-        </div>
+        <h1 className="mt-5 text-3xl tracking-widest">{r.reference}</h1>
         <p className="mt-2 text-sm text-muted">
           Received{" "}
           {new Date(r.created_at).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
         </p>
       </div>
+
+      <NextStep id={r.id} status={r.status} />
 
       <div className="grid gap-12 lg:grid-cols-[1fr_26rem]">
         <div className="space-y-10">
@@ -247,6 +234,11 @@ export default async function RequestDetail({ params }: { params: Promise<{ id: 
                 Email
               </a>
             </div>
+            {r.message && (
+              <p className="mt-6 max-w-prose whitespace-pre-line border-l border-accent pl-4 font-serif text-lg">
+                {r.message}
+              </p>
+            )}
           </section>
 
           <section aria-labelledby="trip">
@@ -273,17 +265,12 @@ export default async function RequestDetail({ params }: { params: Promise<{ id: 
               <Row label={isStay ? "Guests" : isRide ? "Passengers" : "People"}>{r.guests}</Row>
               {isRide && <Row label="Drive type">{chauffeured ? "Chauffeured" : "Self-drive"}</Row>}
               {isRide && r.pickup_location && <Row label="Pick-up place">{r.pickup_location}</Row>}
-              {base && <Row label="Estimate">{money(estimate ?? 0, base.currency)} ({base.note}{fees > 0 ? ", with transfer fees" : ""})</Row>}
-              {r.final_total !== null && <Row label="Final price agreed">{money(r.final_total, currency)}</Row>}
               <Row label="Policies">
                 {r.accepted_policies_at
                   ? `Accepted ${new Date(r.accepted_policies_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}`
                   : "Not recorded"}
               </Row>
             </dl>
-            <p className="mt-2 text-xs text-muted">
-              The estimate uses the listed prices and any transfer fees saved below. Confirm the final price with the guest.
-            </p>
           </section>
 
           {showTransfers && (
@@ -300,24 +287,14 @@ export default async function RequestDetail({ params }: { params: Promise<{ id: 
               />
             </>
           )}
-
-          <PaymentsPanel requestId={r.id} />
-
-          {r.message && (
-            <section aria-labelledby="msg">
-              <h2 id="msg" className="mb-3 text-xl">their message</h2>
-              <p className="max-w-prose whitespace-pre-line border-l border-accent pl-4 font-serif text-lg">{r.message}</p>
-            </section>
-          )}
         </div>
 
-        <aside className="lg:sticky lg:top-8 lg:self-start">
-          <div className="border border-line p-6">
-            <h2 className="mb-4 text-xl">what next</h2>
-            <RequestActions
+        <div className="space-y-10">
+          <section aria-labelledby="price">
+            <h2 id="price" className="mb-3 text-xl">price and notes</h2>
+            <PriceAndNotes
               id={r.id}
               status={r.status}
-              notes={r.internal_notes ?? ""}
               currency={currency}
               showPickupFee={r.pickup_mode !== "none"}
               showDropoffFee={r.dropoff_mode !== "none"}
@@ -326,9 +303,12 @@ export default async function RequestDetail({ params }: { params: Promise<{ id: 
               pickupFee={r.pickup_fee}
               dropoffFee={r.dropoff_fee}
               finalTotal={r.final_total}
+              suggested={suggested}
+              notes={r.internal_notes ?? ""}
             />
-          </div>
-        </aside>
+          </section>
+          <PaymentsPanel requestId={r.id} />
+        </div>
       </div>
     </div>
   );

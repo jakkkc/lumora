@@ -43,7 +43,8 @@ export async function updateRequest(_prev: ActionState, fd: FormData): Promise<A
   const notes = String(fd.get("notes") ?? "").trim().slice(0, 4000);
   if (!STATUSES.includes(status)) return { error: "Unknown status." };
 
-  const patch: Record<string, unknown> = { status, internal_notes: notes || null };
+  const patch: Record<string, unknown> = { status };
+  if (fd.has("notes")) patch.internal_notes = notes || null;
   for (const key of ["pickup_fee", "dropoff_fee", "final_total"]) {
     if (fd.has(key)) {
       const v = amount(fd, key);
